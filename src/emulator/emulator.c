@@ -55,20 +55,25 @@ EmulatorStatus step_machine(Machine *const machine) {
     if (machine->pc == RETURN_ADDRESS)
         return (EmulatorStatus) {IR_DONE, machine->pc};
 
-    const Instruction ins = decode_instruction(machine->mem[machine->pc]);
+    // Fetch and decode
+    const Instruction ins = decode_instruction(machine->mem[machine->pc / 4]);
     machine->pc += 4;
     
+    // Execute
+    enum instruction_retcode ret;
     switch (ins.type) {
         case TYPE_R:
-            return (EmulatorStatus) {RTYPE_TABLE[ins.code](machine, &ins), machine->pc};
+            ret = RTYPE_TABLE[ins.code](machine, &ins);
+            break;
         case TYPE_I:
-            return (EmulatorStatus) {ITYPE_TABLE[ins.code](machine, &ins), machine->pc};
-        case TYPE_INVALID: 
-            return (EmulatorStatus) {IR_INVALID_INSTRUCTION, machine->pc - 4};
+            ret = ITYPE_TABLE[ins.code](machine, &ins);
+            break;
         default:
-            give_up("Emulator error: Invalid instruction return code. Bye.", 1, machine);
+            give_up("Internal emulator error: Invalid instruction return code. Bye.", 1, machine);
     }
+    machine->registers[0] = 0; // the instructions don't check for zero
     
+    return (EmulatorStatus) {ret, machine->pc};
 }
 
 
