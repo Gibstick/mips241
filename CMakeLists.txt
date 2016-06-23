@@ -16,6 +16,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+enable_testing()
+
 macro(use_c99)
   if (CMAKE_VERSION VERSION_LESS "3.1")
     set (CMAKE_C_FLAGS "--std=c99 ${CMAKE_C_FLAGS}")
@@ -28,6 +30,7 @@ use_c99()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 add_subdirectory(src)
+add_subdirectory(test)
 
 
 # Generate headers for lua

@@ -106,7 +106,7 @@ int main(void) {
     while (status.retcode == IR_SUCCESS);
 
     m_print_registers(m);
-    printf("Status: %d\n", status.retcode);
+    fprintf(stderr, "Status: %d\n", status.retcode);
     print_status(&status);
 
     destroy_machine(m);
