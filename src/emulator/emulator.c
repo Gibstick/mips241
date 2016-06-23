@@ -102,10 +102,11 @@ int main(void) {
     load_program(stdin, m, 0);
 
     EmulatorStatus status;
-    do step_machine(m);
+    do status = step_machine(m);
     while (status.retcode == IR_SUCCESS);
 
     m_print_registers(m);
+    printf("Status: %d\n", status.retcode);
     print_status(&status);
 
     destroy_machine(m);
