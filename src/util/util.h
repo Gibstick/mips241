@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <stdnoreturn.h>
 #include "machine/machine.h"
 
 #define PROGRAM_FAILURE 2 // when the MIPS program fails
