@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "machine/machine.h"
-#include "machine/instruction.h"
+#include "machine/decode.h"
 
 #define RTYPE_TABLE_SIZE 64
 #define ITYPE_TABLE_SIZE 64

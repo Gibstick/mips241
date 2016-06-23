@@ -1,4 +1,4 @@
-#include "machine/instruction.h"
+#include "machine/decode.h"
 
 Instruction decode_instruction(uint32_t word) {
     const uint8_t s = (word >> 21) & 0x1F; //0b11111

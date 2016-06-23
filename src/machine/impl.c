@@ -1,6 +1,8 @@
 #include <assert.h>
+#include <stdio.h>
 #include "machine/impl.h"
 
+// Macros
 #define ASSIGN_RTYPE_TABLE(ID) \
     do { \
         RTYPE_TABLE[FUNC_##ID] = ID##_impl; \
@@ -14,6 +16,11 @@
 #define R_REG(REGISTER) m->registers[ins->decoded.r.REGISTER]
 #define I_REG(REGISTER) m->registers[ins->decoded.i.REGISTER]
 #define M_REG(REGISTER) m->registers[REGISTER]
+
+// Constants
+static const uint32_t MAPPED_INPUT_ADDR = 0xFFFF000C; 
+static const uint32_t MAPPED_OUTPUT_ADDR = 0xFFFF0004;
+
 
 enum instruction_retcode (*RTYPE_TABLE[RTYPE_TABLE_SIZE]) (Machine * const, const Instruction * const);
 enum instruction_retcode (*ITYPE_TABLE[ITYPE_TABLE_SIZE]) (Machine * const, const Instruction * const);
@@ -137,18 +144,23 @@ immediate_impl(Machine * const m, const Instruction * const ins)
 
     switch (ins->code) {
         case OP_LW:
-        I_REG(t) = m->mem[word_addr];
-        // TODO: input
-        break;
+            if (byte_addr == MAPPED_INPUT_ADDR)
+                scanf("%c", m->registers + ins->decoded.i.t);
+            else
+                I_REG(t) = m->mem[word_addr];
+            break;
         case OP_SW:
-        m->mem[word_addr] = I_REG(t);
-        // TODO: output
-        break;
+            if (byte_addr == MAPPED_OUTPUT_ADDR)
+                printf("%c", (char) (I_REG(t) & 0xFF));
+            else
+                m->mem[word_addr] = I_REG(t);
+
+            break;
         case OP_BEQ:
-        m->pc += (immediate * 4 * I_REG(s) == I_REG(t));
-        break;
+            m->pc += (immediate * 4 * I_REG(s) == I_REG(t));
+            break;
         case OP_BNE:
-        m->pc += (immediate * 4 * I_REG(s) != I_REG(t));
+            m->pc += (immediate * 4 * I_REG(s) != I_REG(t));
     }
 }
 

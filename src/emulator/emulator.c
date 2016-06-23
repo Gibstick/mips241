@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "emulator/emulator.h"
 #include "machine/machine.h"
 #include "machine/impl.h"
-#include "machine/instruction.h"
+#include "machine/decode.h"
 #include "util/util.h"
 
 static const uint32_t STDOUT_ADDRESS = 0xFFFF000C;
@@ -44,6 +45,8 @@ void load_program(FILE * const infile, Machine *const machine, uint32_t offset) 
 }
 
 
+// Execute one instruction as pointed to by pc.
+// Effects: machine state is modified
 EmulatorStatus step_machine(Machine *const machine) {
     // Follows the fetch-decode-execute loop taught in CS 241,
     // more or less.
@@ -76,6 +79,21 @@ EmulatorStatus step_machine(Machine *const machine) {
     return (EmulatorStatus) {ret, machine->pc};
 }
 
+void print_status(const EmulatorStatus * const status) {
+    // TODO
+    static const char * status_strings[] = {
+        [IR_DONE] = "Program completed successfully.",
+        [IR_SUCCESS] = "Program execution paused.",
+        [IR_UNALIGNED_MEMORY_ACCESS] = "Program attempted to read/write an unaligned address.",
+        [IR_UNALIGNED_INSTRUCTION_FETCH] = "Program counter contains an unaligned address.",
+        [IR_OUT_OF_RANGE_MEMORY_ACCESS] = "Program attempted to read/write memory that was out of bounds.",
+        [IR_OUT_OF_RANGE_INSTRUCTION_FETCH] = "Program counter contains an  out-of-bounds address.",
+        [IR_INVALID_INSTRUCTION] = "An invalid instruction was encountered."
+    };
+
+
+}
+
 
 int main(void) {
     init_tables();
@@ -83,9 +101,12 @@ int main(void) {
 
     load_program(stdin, m, 0);
 
-    while (step_machine(m).retcode == IR_SUCCESS);
+    EmulatorStatus status;
+    do step_machine(m);
+    while (status.retcode == IR_SUCCESS);
 
     m_print_registers(m);
-    printf("status: %d\n", step_machine(m).retcode);
+    print_status(&status);
+
     destroy_machine(m);
 }

@@ -23,15 +23,9 @@
 #define OP_SW     0x2B
 
 struct R_Type {
-    uint8_t d;
-    uint8_t s;
-    uint8_t t;
 };
 
 struct I_Type {
-    uint8_t s;
-    uint8_t t;
-    uint16_t imm;
 };
 
 typedef struct Instruction {
@@ -41,8 +35,16 @@ typedef struct Instruction {
        TYPE_I = 2
    } type;
    union {
-       struct R_Type r;
-       struct I_Type i;
+       struct {
+            uint8_t d;
+            uint8_t s;
+            uint8_t t;
+       } r;
+       struct {
+            uint8_t s;
+            uint8_t t;
+            uint16_t imm;
+       } i;
    } decoded;  
    uint8_t code; // func or opcode, depending on type
 } Instruction;

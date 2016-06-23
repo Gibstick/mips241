@@ -23,7 +23,7 @@ Machine *init_machine(uint32_t max_memory_bytes) {
         + (max_memory_bytes != 0) * (max_memory_bytes / 4);
 
     m->mem = malloc(sizeof(uint32_t) * num_words);
-    give_up_unless(m->mem != NULL, "RIP in memories", EXIT_FAILURE, m);
+    give_up_unless(m->mem != NULL, "Can't even malloc. Bye.", EXIT_FAILURE, m);
     m->mem_size = num_words;
 
     return m;
