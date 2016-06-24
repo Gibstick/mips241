@@ -7,3 +7,5 @@ if (SH)
         ${CMAKE_CURRENT_SOURCE_DIR}/basic/smoke.config
     )
 endif (SH)
+
+add_subdirectory(unit)

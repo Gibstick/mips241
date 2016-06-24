@@ -1,7 +1,7 @@
 #include "machine/decode.h"
 
 Instruction decode_instruction(uint32_t word) {
-    const uint8_t s = (word >> 21) & 0x1F; //0b11111
+    const uint8_t s = (word >> 21) & 0x1F; //0b11111 (5)
     const uint8_t t = (word >> 16) & 0x1F;
     const uint8_t d = (word >> 11) & 0x1F;
 
@@ -10,7 +10,7 @@ Instruction decode_instruction(uint32_t word) {
         (immediate_u > INT16_MAX) ? UINT16_MAX - immediate_u : immediate_u;
 
     const uint8_t opcode = (word >> 26);
-    const uint8_t func = word & 0x1F; // l
+    const uint8_t func = word & 0x3F; // 0b111111 (6)
 
     if (opcode == 0) {
         return (Instruction) {

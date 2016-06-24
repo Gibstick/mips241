@@ -10,7 +10,7 @@ set(mips-emulator_VERSION_MINOR 1)
 #    "${PROJECT_BINARY_DIR}/config.h"
 #    )
 
-#include_directories("${PROJECT_BINARY_DIR}")
+include_directories(src)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
