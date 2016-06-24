@@ -28,7 +28,7 @@ endmacro(use_c99)
 
 use_c99()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic")
 add_subdirectory(src)
 add_subdirectory(test)
 
