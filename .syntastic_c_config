@@ -1,0 +1,4 @@
+-Isrc/
+-std=c99
+-pedantic
+-Wall
