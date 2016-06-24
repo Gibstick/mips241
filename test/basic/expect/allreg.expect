@@ -29,5 +29,5 @@ register 27: 0x00003f26
 register 28: 0x00002b6c
 register 29: 0x00006c9d
 register 30: 0x00006a08
-register 31: 0x00000850
-Status: 6
+register 31: 0x8123456c
+Status: 0
