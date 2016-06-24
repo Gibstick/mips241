@@ -6,8 +6,6 @@
 #include "machine/impl.h"
 
 // forward declarations
-typedef struct Machine Machine; 
-
 typedef struct EmulatorStatus {
     enum instruction_retcode retcode;
     uint32_t pc; 

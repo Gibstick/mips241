@@ -30,4 +30,4 @@ register 28: 0x00000000
 register 29: 0x00000000
 register 30: 0x00000000
 register 31: 0x8123456c
-Status: 0
+Program completed successfully.

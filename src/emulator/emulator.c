@@ -9,8 +9,6 @@
 #include "machine/decode.h"
 #include "util/util.h"
 
-static const uint32_t STDOUT_ADDRESS = 0xFFFF000C;
-static const uint32_t STDIN_ADDRESS = 0xFFFF0008;
 static const uint32_t RETURN_ADDRESS = 0x8123456c;
 
 static bool is_little_endian(void) {
@@ -79,7 +77,7 @@ EmulatorStatus step_machine(Machine *const machine) {
     return (EmulatorStatus) {ret, machine->pc};
 }
 
-void print_status(const EmulatorStatus * const status) {
+static void print_status(FILE *out, const EmulatorStatus * const status) {
     // TODO
     static const char * status_strings[] = {
         [IR_DONE] = "Program completed successfully.",
@@ -91,7 +89,7 @@ void print_status(const EmulatorStatus * const status) {
         [IR_INVALID_INSTRUCTION] = "An invalid instruction was encountered."
     };
 
-
+    fprintf(out, "%s\n", status_strings[status->retcode]);
 }
 
 
@@ -106,8 +104,7 @@ int main(void) {
     while (status.retcode == IR_SUCCESS);
 
     m_print_registers(m);
-    fprintf(stderr, "Status: %d\n", status.retcode);
-    print_status(&status);
+    print_status(stderr, &status);
 
     destroy_machine(m);
 }
