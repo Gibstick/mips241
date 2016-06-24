@@ -1,5 +1,9 @@
 language: c
 
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y realpath
+
 script: mkdir build && cd build && cmake .. && make && ctest -V
 
 compiler:
