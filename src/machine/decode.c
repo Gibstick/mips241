@@ -21,9 +21,11 @@ Instruction decode_instruction(uint32_t word) {
     } else {
         return (Instruction) {
             .type = TYPE_I,
-            .decoded = {.i = { .s = s, .t = t }},
+            .decoded = {.i = { .s = s, .t = t, .imm = immediate }},
             .code = opcode
         };
     }
+
+    
     // Note: invalid instructions will be caught at dispatch 
 }

@@ -22,12 +22,6 @@
 #define OP_LW     0x23
 #define OP_SW     0x2B
 
-struct R_Type {
-};
-
-struct I_Type {
-};
-
 typedef struct Instruction {
    enum {
        TYPE_INVALID = 0,
