@@ -144,9 +144,12 @@ immediate_impl(Machine * const m, const Instruction * const ins)
 
     switch (ins->code) {
         case OP_LW:
-            if (byte_addr == MAPPED_INPUT_ADDR)
-                scanf("%c", m->registers + ins->decoded.i.t);
-            else
+            if (byte_addr == MAPPED_INPUT_ADDR) {
+                // TODO: does the reference emulator do this?
+                int c = getchar();
+                if (c != EOF)
+                    m->registers[ins->decoded.i.t] = c;
+            } else
                 I_REG(t) = m->mem[word_addr];
             break;
         case OP_SW:
@@ -162,9 +165,11 @@ immediate_impl(Machine * const m, const Instruction * const ins)
         case OP_BNE:
             m->pc += (immediate * 4 * I_REG(s) != I_REG(t));
     }
+
+    return IR_SUCCESS;
 }
 
-bool init_tables(void) {
+void init_tables(void) {
     assert(RTYPE_TABLE_SIZE == ITYPE_TABLE_SIZE);
 
     for (int i = 0; i < RTYPE_TABLE_SIZE; ++i) {
@@ -204,5 +209,4 @@ bool init_tables(void) {
         assert(icount == 4);
     }
 #endif
-
 }

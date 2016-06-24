@@ -22,7 +22,7 @@ enum instruction_retcode {
 
 // Must call this function on startup to initialize the dispatch table(s)!
 // Boolean indicates success.
-bool init_tables(void);
+void init_tables(void);
 
 // Table of function pointers for r-type instructions
 // indexed by 6-bit func code
