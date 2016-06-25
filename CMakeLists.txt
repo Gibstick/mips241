@@ -29,6 +29,11 @@ endmacro(use_c99)
 use_c99()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic")
+
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
+
+
 add_subdirectory(src)
 add_subdirectory(test)
 
