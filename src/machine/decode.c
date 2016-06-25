@@ -7,7 +7,7 @@ Instruction decode_instruction(uint32_t word) {
 
     const uint16_t immediate_u = word & 0xFFFF;
     const int16_t immediate =
-        (immediate_u > INT16_MAX) ? UINT16_MAX - immediate_u : immediate_u;
+        (immediate_u > INT16_MAX) ? immediate_u - (UINT16_MAX + 1) : immediate_u;
 
     const uint8_t opcode = (word >> 26);
     const uint8_t func = word & 0x3F; // 0b111111 (6)

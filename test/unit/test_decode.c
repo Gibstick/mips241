@@ -111,7 +111,7 @@ static const char *all_tests(void) {
     mu_run_test(test_decode_lis);
     mu_run_test(test_decode_sltu);
     mu_run_test(test_decode_beq);
-//    mu_run_test(test_decode_lw);
+    mu_run_test(test_decode_lw);
     // Note: all tests must run here!
 
     return NULL;
