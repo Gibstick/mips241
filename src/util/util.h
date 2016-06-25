@@ -8,9 +8,20 @@
 
 #define PROGRAM_FAILURE 2 // when the MIPS program fails
 
+
+#ifdef STDC__
+    #ifdef __STDC_VERSION__
+        #if defined(__STDC_VERSION) && (__STDC__VERSION__ >= 201112L) // C11
+            #define noreturn __Noreturn
+        #endif
+    #endif
+#else
+    #define noreturn 
+#endif
+
 // Make the program give up on life. Before that,
 //   it frees memory and prints out message, then exits with status. 
-static inline void give_up(const char *message, int status, Machine *machine) {
+static inline noreturn void give_up(const char *message, int status, Machine *machine) {
     m_print_registers(machine);
     destroy_machine(machine);
     fprintf(stderr, "%s\n", message);
@@ -19,7 +30,10 @@ static inline void give_up(const char *message, int status, Machine *machine) {
 
 // Make the program give up if the condition is not true.
 //   Frees memory before exiting.
-static inline void give_up_unless(bool condition, const char *message, int status, Machine *machine) {
+static inline noreturn void give_up_unless(bool condition, const char *message, int status, Machine *machine) {
     if (!condition) give_up(message, status, machine);
 }
+
+        
+
 #endif
