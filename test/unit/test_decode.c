@@ -89,6 +89,14 @@ static const char *test_decode_lw(void) {
     return test_decode_itype(0x8e51ffe8, 18, 17, -24, OP_LW);
 }
 
+static const char *test_decode_sw(void) {
+    return test_decode_itype(0xae930000, 20, 19, 0, OP_SW);
+}
+
+static const char *test_decode_slt(void) {
+    return test_decode_rtype(0x02d7a82a, 21, 22, 23, FUNC_SLT);
+}
+
 static const char *test_decode_sltu(void) {
     return test_decode_rtype(0x03fff82b, 31, 31, 31, FUNC_SLTU);
 }
@@ -97,6 +105,17 @@ static const char *test_decode_beq(void) {
     return test_decode_itype(0x10850010, 4, 5, 16, OP_BEQ);
 }
 
+static const char *test_decode_bne(void) {
+    return test_decode_itype(0x1719fa0b, 24, 25, -1525, OP_BNE);
+}
+
+static const char *test_decode_jr(void) {
+    return test_decode_rtype(0x03e00008, 0, 31, 0, FUNC_JR);
+}
+
+static const char *test_decode_jalr(void) {
+    return test_decode_rtype(0x03400009, 0, 26, 0, FUNC_JALR);
+}
 
 
 static const char *all_tests(void) {
@@ -109,9 +128,14 @@ static const char *all_tests(void) {
     mu_run_test(test_decode_mfhi);
     mu_run_test(test_decode_mflo);
     mu_run_test(test_decode_lis);
+    mu_run_test(test_decode_lw);
+    mu_run_test(test_decode_sw);
+    mu_run_test(test_decode_slt);
     mu_run_test(test_decode_sltu);
     mu_run_test(test_decode_beq);
-    mu_run_test(test_decode_lw);
+    mu_run_test(test_decode_bne);
+    mu_run_test(test_decode_jr);
+    mu_run_test(test_decode_jalr);
     // Note: all tests must run here!
 
     return NULL;
