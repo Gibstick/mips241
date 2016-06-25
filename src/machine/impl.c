@@ -17,6 +17,10 @@
 #define I_REG(REGISTER) m->registers[ins->decoded.i.REGISTER]
 #define M_REG(REGISTER) m->registers[REGISTER]
 
+// Macro for converting a uint32_t to an int32_t safely
+#define make_signed(X) \
+       (int32_t)( (X > INT32_MAX) ? X - UINT32_MAX - 1 : X )
+
 // Constants
 static const uint32_t MAPPED_INPUT_ADDR = 0xFFFF000C; 
 static const uint32_t MAPPED_OUTPUT_ADDR = 0xFFFF0004;
@@ -44,10 +48,7 @@ static enum instruction_retcode SUB_impl(Machine * const m, const Instruction * 
 
 static enum instruction_retcode MULTU_impl(Machine * const m, const Instruction * const ins)
 {
-    // need to sign extend
-    const int32_t lhs = R_REG(s) > 0x7FFFFFF ? ~R_REG(s) + 1 : R_REG(s);
-    const int32_t rhs = R_REG(t) > 0x7FFFFFF ? ~R_REG(t) + 1 : R_REG(t);
-    const uint64_t result = lhs * rhs;
+    const uint64_t result = (int64_t)R_REG(s) * R_REG(t);
     m->hi = result >> 32;
     m->lo = result & 0xFFFFFFFF;
     return IR_SUCCESS;
@@ -55,7 +56,7 @@ static enum instruction_retcode MULTU_impl(Machine * const m, const Instruction 
 
 static enum instruction_retcode MULT_impl(Machine * const m, const Instruction * const ins)
 {
-    const uint64_t result = R_REG(s) * R_REG(t);
+    const uint64_t result = (int64_t)make_signed(R_REG(s)) * make_signed(R_REG(t));
     m->hi = result >> 32;
     m->lo = result & 0xFFFFFFFF;
     return IR_SUCCESS;
@@ -63,17 +64,15 @@ static enum instruction_retcode MULT_impl(Machine * const m, const Instruction *
 
 static enum instruction_retcode DIV_impl(Machine * const m, const Instruction * const ins)
 {
-    m->lo = R_REG(s) / R_REG(t);
-    m->hi = R_REG(s) % R_REG(t);
+    m->lo = make_signed(R_REG(s)) / make_signed(R_REG(t));
+    m->hi = make_signed(R_REG(s)) % make_signed(R_REG(t));
     return IR_SUCCESS;
 }
 
 static enum instruction_retcode DIVU_impl(Machine * const m, const Instruction * const ins)
 {
-    const int32_t lhs = R_REG(s) > 0x7FFFFFF ? ~R_REG(s) + 1 : R_REG(s);
-    const int32_t rhs = R_REG(t) > 0x7FFFFFF ? ~R_REG(t) + 1 : R_REG(t);
-    m->lo = lhs / rhs;
-    m->hi = lhs % rhs;
+    m->lo = R_REG(s) / R_REG(t);
+    m->hi = R_REG(s) % R_REG(t);
     return IR_SUCCESS;
 }
 
@@ -98,9 +97,7 @@ static enum instruction_retcode LIS_impl(Machine * const m, const Instruction * 
 
 static enum instruction_retcode SLT_impl(Machine * const m, const Instruction * const ins)
 {
-    const int32_t lhs = R_REG(s) > 0x7FFFFFF ? ~R_REG(s) + 1 : R_REG(s);
-    const int32_t rhs = R_REG(t) > 0x7FFFFFF ? ~R_REG(t) + 1 : R_REG(t);
-    R_REG(d) = lhs < rhs;
+    R_REG(d) = make_signed(R_REG(s)) < make_signed(R_REG(t));
     return IR_SUCCESS;
 }
 
