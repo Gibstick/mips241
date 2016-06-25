@@ -71,6 +71,7 @@ EmulatorStatus step_machine(Machine *const machine) {
             break;
         default:
             give_up("Internal emulator error: Invalid instruction return code. Bye.", 1, machine);
+            assert(false); // squelch warnings
     }
     machine->registers[0] = 0; // the instructions don't check for zero
     
