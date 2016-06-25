@@ -10,8 +10,8 @@
 #define FUNC_MULT   0x18
 #define FUNC_DIV    0x1A
 #define FUNC_DIVU   0x1B
-#define FUNC_MFLO   0x10
-#define FUNC_MFHI   0x12
+#define FUNC_MFLO   0x12
+#define FUNC_MFHI   0x10
 #define FUNC_LIS    0x14
 #define FUNC_SLT    0x2A
 #define FUNC_SLTU   0x2B

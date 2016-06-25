@@ -2,10 +2,8 @@
 #include "machine/decode.h"
 #include <stdio.h>
 
-uint32_t test_run = 0;
-
 static const char *test_decode_add(void) {
-    const uint32_t add_1_2_3 = 0x00430820; 
+    const uint32_t add_1_2_3 = 0x00430820;
     Instruction ins = decode_instruction(add_1_2_3);
 
     mu_assert(ins.type == TYPE_R, "bad type");
@@ -56,11 +54,24 @@ static const char *test_decode_beq(void) {
     return NULL;
 }
 
+static const char *test_decode_mflo(void) {
+    Instruction ins = decode_instruction(0x00006812); // mflo $13
+
+    mu_assert(ins.type == TYPE_R, "bad type");
+    mu_assert(ins.decoded.r.d == 13, "bad $d");
+    mu_assert(ins.decoded.r.s == 0, "bad $s");
+    mu_assert(ins.decoded.r.t == 0, "bad $r");
+    mu_assert(ins.code == FUNC_MFLO, "bad func code");
+
+    return NULL;
+}
+
 static const char *all_tests(void) {
     mu_run_test(test_decode_add);
     mu_run_test(test_decode_sub);
     mu_run_test(test_decode_sltu);
     mu_run_test(test_decode_beq);
+    mu_run_test(test_decode_mflo);
     // Note: all tests must run here!
 
     return NULL;
