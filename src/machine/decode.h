@@ -37,7 +37,7 @@ typedef struct Instruction {
        struct {
             uint8_t s;
             uint8_t t;
-            uint16_t imm;
+            int16_t imm;
        } i;
    } decoded;  
    uint8_t code; // func or opcode, depending on type
