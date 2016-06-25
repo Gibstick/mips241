@@ -4,7 +4,7 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y --no-install-recommends realpath
 
-script: mkdir build && cd build && cmake .. && make && ctest -V
+script: mkdir build && cd build && cmake -DSANITIZE_ADDRESS=on .. && make && ctest -V
 
 compiler:
     - gcc
