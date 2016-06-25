@@ -18,15 +18,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 enable_testing()
 
-macro(use_c99)
-  if (CMAKE_VERSION VERSION_LESS "3.1")
-    set (CMAKE_C_FLAGS "--std=c99 ${CMAKE_C_FLAGS}")
-  else ()
-    set (CMAKE_C_STANDARD 99)
-  endif ()
-endmacro(use_c99)
 
-use_c99()
+if (CMAKE_VERSION VERSION_LESS "3.1")
+  set (CMAKE_C_FLAGS "--std=c99 ${CMAKE_C_FLAGS}")
+else ()
+  set (CMAKE_C_STANDARD 99)
+endif ()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic")
 
