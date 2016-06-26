@@ -1,5 +1,9 @@
 language: c
 
+# This gets us CMake 2.8.12 (>= 2.8.8)
+sudo: required
+dist: trusty
+
 before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y --no-install-recommends realpath
