@@ -33,25 +33,3 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/sanitizers-cmake/cmake" ${CM
 
 add_subdirectory(src)
 add_subdirectory(test)
-
-
-# Generate headers for lua
-#set(headers_to_process
-#    ${PROJECT_SOURCE_DIR}/src/emulator.h 
-#    ${PROJECT_SOURCE_DIR}/src/machine.h)
-#
-#set(lua_header_dir
-#    ${PROJECT_BINARY_DIR}/include/)
-#
-#add_custom_target(directories
-#    COMMAND ${CMAKE_COMMAND} -E make_directory ${lua_header_dir})
-#
-#add_custom_target(lua_headers
-#    COMMAND grep -F "// _LUA_EXPORT" ${headers_to_process} > ${lua_header_dir}/lua_header.h
-#    COMMENT "Generating lua headers")
-#
-#add_dependencies(lua_headers
-#    directories)
-
-#add_dependencies(emulator
-#    lua_headers)

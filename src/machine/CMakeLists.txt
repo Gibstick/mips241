@@ -1,1 +1,1 @@
-add_library(machine machine.c impl.c decode.c) 
+add_library(machine OBJECT machine.c impl.c decode.c) 
