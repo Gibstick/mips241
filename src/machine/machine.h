@@ -1,6 +1,10 @@
+/**
+ * The structure and associated functions for the Machine structure,
+ * encapsulating all state for a * CS 241 MIPS machine.
+ */
+
 #ifndef __MACHINE_H__
 #define __MACHINE_H__
-// Data structures for the underlying machine
 
 #include <stdint.h>
 
@@ -22,19 +26,17 @@ typedef struct Machine {
 //   is given to the machine in bytes. Otherwise,
 //   the default amount of memory is used. 
 // Requires: max_memory_bytes is divisible by 4
-Machine *init_machine(uint32_t max_memory_bytes); // _LUA_EXPORT
+Machine *init_machine(uint32_t max_memory_bytes);
 
 
 // Frees all memory associated with a Machine.
 // Requires: machine allocated with init_machine
 // Effects: memory freed
-void destroy_machine(Machine *machine); // _LUA_EXPORT
+void destroy_machine(Machine *machine);
 
-
-// These functions are for Lua
 
 // Prints all registers to stderr.
 // Effects: output
-void m_print_registers(const Machine *const machine); // _LUA_EXPORT
+void m_print_registers(const Machine *const machine);
 
 #endif

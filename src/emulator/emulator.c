@@ -8,6 +8,7 @@
 #include "machine/impl.h"
 #include "machine/decode.h"
 #include "util/util.h"
+#include "common/defs.h"
 
 static const uint32_t RETURN_ADDRESS = 0x8123456c;
 
@@ -78,3 +79,6 @@ EmulatorStatus step_machine(Machine *const machine) {
     return (EmulatorStatus) {ret, machine->pc};
 }
 
+void init_emulator(void) {
+    init_tables();    
+}

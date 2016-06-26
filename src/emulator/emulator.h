@@ -1,20 +1,23 @@
+/**
+ * Functions for actually running things in the emulator
+ */
 #ifndef __EMULATOR_H__
 #define __EMULATOR_H__
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "machine/impl.h"
+#include "common/defs.h"
+#include "machine/machine.h"
 
-// forward declarations
-typedef struct EmulatorStatus {
-    enum instruction_retcode retcode;
-    uint32_t pc; 
-} EmulatorStatus;
 
-void load_program(FILE *const file, // _LUA_EXPORT
-                  Machine *const machine,     // _LUA_EXPORT
-                  uint32_t offset);           // _LUA_EXPORT 
+// Load a program from a FILE into the machine at the offset.
+void load_program(FILE *const file,
+                  Machine *const machine,
+                  uint32_t offset);
 
-EmulatorStatus step_machine(Machine *const machine);    // _LUA_EXPORT
+// Must call this function on startup to initialize things. 
+void init_emulator(void);
+
+EmulatorStatus step_machine(Machine *const machine);
 
 #endif

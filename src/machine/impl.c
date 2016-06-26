@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
+#include "common/defs.h"
 #include "machine/impl.h"
+#include "machine/machine.h"
 
 // Macros
 #define ASSIGN_RTYPE_TABLE(ID) \

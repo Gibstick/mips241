@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "machine/impl.h"
 #include "machine/machine.h"
 #include "emulator/emulator.h"
+#include "common/defs.h"
 
 static void print_status(FILE *out, const EmulatorStatus * const status) {
     // TODO
@@ -20,7 +20,7 @@ static void print_status(FILE *out, const EmulatorStatus * const status) {
 
 
 int main(void) {
-    init_tables();
+    init_emulator();
     Machine *m = init_machine(0);
 
     load_program(stdin, m, 0);
