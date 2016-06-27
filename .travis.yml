@@ -4,9 +4,14 @@ language: c
 sudo: required
 dist: trusty
 
+env:
+    - RACKET_VERSION=6.3
+
 before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y --no-install-recommends realpath
+    - git clone --depth 1 https://github.com/greghendershott/travis-racket.git >/dev/null
+    - bash travis-racket/install-racket.sh
 
 script: mkdir build && cd build && cmake -DSANITIZE_ADDRESS=on .. && make && ctest -V
 

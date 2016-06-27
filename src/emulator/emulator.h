@@ -18,6 +18,11 @@ void load_program(FILE *const file,
 // Must call this function on startup to initialize things. 
 void init_emulator(void);
 
+// Interpet one instruction and advance the machine state
 EmulatorStatus step_machine(Machine *const machine);
+
+// Interpet as many instructions as we can until 
+//   we are required to stop.
+EmulatorStatus step_machine_loop(Machine *const machine);
 
 #endif

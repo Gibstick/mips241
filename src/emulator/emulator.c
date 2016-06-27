@@ -79,6 +79,14 @@ EmulatorStatus step_machine(Machine *const machine) {
     return (EmulatorStatus) {ret, machine->pc};
 }
 
+EmulatorStatus step_machine_loop(Machine *const machine) {
+    EmulatorStatus status;
+    do status = step_machine(machine);
+    while (status.retcode == IR_SUCCESS);
+
+    return status;
+}
+
 void init_emulator(void) {
     init_tables();    
 }
