@@ -1,8 +1,8 @@
 /**
  * Functions for actually running things in the emulator
  */
-#ifndef __EMULATOR_H__
-#define __EMULATOR_H__
+#ifndef EMULATOR_H__
+#define EMULATOR_H__
 
 #include <stdint.h>
 #include <stdbool.h>

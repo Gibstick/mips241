@@ -1,8 +1,8 @@
 /**
  * Implemntations of all the instructions.
  */
-#ifndef __IMPL_H__
-#define __IMPL_H__
+#ifndef IMPL_H__
+#define IMPL_H__
 
 #include <stdint.h>
 #include <stdbool.h>

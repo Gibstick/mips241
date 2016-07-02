@@ -1,8 +1,8 @@
 /*
  * Function for decoding an instruction.
  */
-#ifndef __INSTRUCTION_H__
-#define __INSTRUCTION_H__
+#ifndef INSTRUCTION_H__
+#define INSTRUCTION_H__
 
 #include <stdint.h>
 #include "common/defs.h"

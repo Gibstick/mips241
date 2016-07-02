@@ -3,8 +3,8 @@
  * encapsulating all state for a * CS 241 MIPS machine.
  */
 
-#ifndef __MACHINE_H__
-#define __MACHINE_H__
+#ifndef MACHINE_H__
+#define MACHINE_H__
 
 #include <stdint.h>
 
