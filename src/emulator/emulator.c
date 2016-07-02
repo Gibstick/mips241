@@ -12,11 +12,6 @@
 
 static const uint32_t RETURN_ADDRESS = 0x8123456c;
 
-static bool is_little_endian(void) {
-    static const uint32_t n = 1;
-    return ((uint8_t *)&n)[0];
-}
-
 // 16 megabytes of memory
 void load_program(FILE * const infile, Machine *const machine, uint32_t offset) {
 
@@ -27,13 +22,9 @@ void load_program(FILE * const infile, Machine *const machine, uint32_t offset) 
 
     uint32_t curword;
     uint32_t i = 0;
-    while(fread(&curword, sizeof(curword), 1, infile) != 0) {
-        if (is_little_endian()) {
-            curword = ((curword>>24)&0xff) |
-                      ((curword<<8)&0xff0000) |
-                      ((curword>>8)&0xff00) |
-                      ((curword<<24)&0xff000000);
-        }
+    while (fread(&curword, sizeof(curword), 1, infile) != 0) {
+        if (is_little_endian())
+            curword = bswap_32(curword);
         machine->mem[i + offset] = curword;
         ++i;
         give_up_unless(i < machine->mem_size, "Your program is too big", PROGRAM_FAILURE, machine);
@@ -85,6 +76,27 @@ EmulatorStatus step_machine_loop(Machine *const machine) {
     while (status.retcode == IR_SUCCESS);
 
     return status;
+}
+
+void dump_memory(const Machine *const machine, const char *filename) {
+    FILE *dumpfile = fopen(filename, "wb");
+
+    if (dumpfile == NULL) {
+        fprintf(stderr, "Unable to open file %s for memory dump.", filename);
+        return;
+    }
+
+    for (size_t i = 0; i < machine->mem_size; ++i) {
+        const uint32_t word = bswap_32(machine->mem[i]);
+        size_t ret = fwrite(&word, sizeof(word), 1, dumpfile);
+
+        if (ret != 1) {
+            fprintf(stderr, "Memory dump to file %s failed.", filename);
+            break;
+        }
+    }
+
+    fclose(dumpfile);
 }
 
 void init_emulator(void) {

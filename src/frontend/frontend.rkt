@@ -46,7 +46,7 @@ Stuff that is common to all frontends.
     (error "Null pointer??? Bye."))
   (let loop
     ([word (read-bytes 4 in)]
-     [idx offset])
+     [idx (/ offset 4)])
     (cond
       [(eof-object? word) (void)]
       [(idx . >= . (machine-mem-size m))
@@ -97,7 +97,7 @@ Stuff that is common to all frontends.
          ,(lambda (f) (display-version true))
          ("Display the version number")]
         [("-l" "--load-at")
-         ,(lambda (f addr) (load-address addr))
+         ,(lambda (f addr) (load-address (string->number addr)))
          ("Load the program at <address>" "address")])
        ,ps-list)
      (lambda (flag-accum [filename false]) filename)
@@ -113,7 +113,7 @@ Stuff that is common to all frontends.
   
   (with-input-from-file
       filename
-    (thunk (load-program! m 0)))
+    (thunk (load-program! m (load-address))))
   
   (define status (step-machine!/loop m))
   

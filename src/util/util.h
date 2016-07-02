@@ -34,6 +34,15 @@ static inline noreturn void give_up_unless(bool condition, const char *message, 
     if (!condition) give_up(message, status, machine);
 }
 
-        
+static const uint32_t n = 1;
 
-#endif
+#define is_little_endian() (((uint8_t *)&n)[0]) \
+
+
+#define bswap_32(x) \
+    ((x >> 24) & UINT32_C(0xff)) |\
+    ((x <<  8) & UINT32_C(0xff0000)) |\
+    ((x >>  8) & UINT32_C(0xff00)) |\
+    ((x << 24) & UINT32_C(0xff000000))
+
+#endif // ifdef __UTIL_H__

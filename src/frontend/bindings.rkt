@@ -21,7 +21,8 @@ Basically, the following files need to be "ported":
          (struct-out emulator-status)
          init-emulator!
          step-machine!
-         step-machine!/loop)
+         step-machine!/loop
+         dump-memory)
 
 (define get-paths-for-lib
   (const
@@ -88,3 +89,7 @@ Basically, the following files need to be "ported":
   #:c-id step_machine_loop)
 
 
+;; Dump memory to file
+(define-mips241 dump-memory
+  (_fun _machine-pointer _path -> _void)
+  #:c-id dump_memory)

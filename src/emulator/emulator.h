@@ -25,4 +25,7 @@ EmulatorStatus step_machine(Machine *const machine);
 //   we are required to stop.
 EmulatorStatus step_machine_loop(Machine *const machine);
 
+// Dump memory to the file
+void dump_memory(const Machine *const machine, const char *filename);
+
 #endif
