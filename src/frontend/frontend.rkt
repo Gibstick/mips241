@@ -84,10 +84,10 @@ Stuff that is common to all frontends.
                #:help-strings [help-strings empty])
   (init-emulator!)
   (define m (init-machine 0))
-  
+
   (define ps-list
     (list* 'ps "" "Frontend description:" help-strings))
-  
+
   (define filename
     (parse-command-line
      (find-system-path 'run-file)
@@ -102,21 +102,24 @@ Stuff that is common to all frontends.
        ,ps-list)
      (lambda (flag-accum [filename false]) filename)
      '("filename")))
-  
+
   (when (display-version)
     (displayln version)
     (exit))
-  
+
   (unless filename
     (displayln "Invalid usage. Try --help." (current-error-port))
+    (displayln "For input from standard input, give '-' as the filename." (current-error-port))
     (exit 1))
-  
-  (with-input-from-file
-      filename
-    (thunk (load-program! m (load-address))))
-  
+
+  (if (equal? filename "-")
+      (load-program! m (load-address))
+      (with-input-from-file
+        filename
+        (thunk (load-program! m (load-address)))))
+
   (define status (step-machine!/loop m))
-  
+
   (post-fn m status))
 
 (module+ main
