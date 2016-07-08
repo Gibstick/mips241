@@ -34,7 +34,8 @@ Stuff that is common to all frontends.
                      (~r #:base 16 #:min-width 8 #:pad-string "0"
                          (send m get-reg reg))))
            (range i (min (+ i 4) num-registers)))
-      "  "))))
+      "  ")
+     (current-error-port))))
 
 
 ;; Load a program into a machine at offset,
