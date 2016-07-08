@@ -1,5 +1,5 @@
 add_library(emulator OBJECT emulator.c)
 
-add_executable(mips241-bare main.c)
+add_executable(cmips241 main.c)
 
-target_link_libraries(mips241-bare mips241)
+target_link_libraries(cmips241 mips241)
