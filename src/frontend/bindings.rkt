@@ -15,15 +15,13 @@ Basically, the following files need to be "ported":
          ffi/unsafe/alloc)
 
 (provide num-registers
-         (struct-out machine)
-         destroy-machine!
-         init-machine
          (struct-out emulator-status)
          init-emulator!
-         step-machine!
-         step-machine!/loop
-         dump-memory)
+         machine%)
 
+;; paths for the shared object/dll should be
+;; 1. same dir as the racket binary
+;; 2. ../lib
 (define get-paths-for-lib
   (const
    (list (simplify-path (build-path (find-system-path 'run-file) 'up))
@@ -42,6 +40,7 @@ Basically, the following files need to be "ported":
    [pc _uint32]
    [hi _uint32]
    [lo _uint32]))
+
 
 ;; Free the resources associated with a Machine.
 (define-mips241 destroy-machine!
@@ -90,6 +89,91 @@ Basically, the following files need to be "ported":
 
 
 ;; Dump memory to file
-(define-mips241 dump-memory
+(define-mips241 dump-memory/fn
   (_fun _machine-pointer _path -> _void)
   #:c-id dump_memory)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; A class to wrap a Machine
+;; This gives us the dynamic capabilities we need for our plugin scripts
+(define machine%
+  (class object%
+    ;; init
+    (super-new)
+    (init [memory-size 0])
+
+    ;; private fields
+    (define m (init-machine memory-size))
+    (define mem-size (machine-mem-size m))
+
+    ;; public methods
+
+    ;; return the amount of memory available to the machine
+    (define/public (get-mem-size) mem-size)
+
+    ;; return the word at word-address idx
+    (define/public (get-mem idx)
+      (when (idx . >= . mem-size)
+        (raise-argument-error 'get-mem
+                              (format "an integer less than ~a" mem-size)
+                              idx))
+      (ptr-ref (machine-mem m)
+               _uint32
+               idx))
+
+    ;; set the word at word-address idx
+    (define/public (set-mem! idx val)
+      (when (idx . >= . mem-size)
+        (raise-argument-error 'get-mem
+                              (format "an integer less than ~a" mem-size)
+                              idx))
+      (ptr-set! (machine-mem m)
+                _uint32
+                idx
+                val))
+
+    ;; get/set register n
+    (define/public (get-reg n)
+      (when (n . >= . num-registers)
+        (raise-argument-error 'get-mem
+                              (format "an integer less than ~a" num-registers)
+                              n))
+      (array-ref (machine-registers m) n))
+    (define/public (set-reg! n val)
+      (when (n . >= . num-registers)
+        (raise-argument-error 'get-mem
+                              (format "an integer less than ~a" num-registers)
+                              n))
+      (array-set! (machine-registers m) n val))
+
+    ;; get/set pc
+    (define/public (get-pc)
+      (machine-pc m))
+    (define/public (set-pc! val)
+      (set-machine-pc! m val))
+
+    ;; get/set lo
+    (define/public (get-lo)
+      (machine-lo m))
+    (define/public (set-lo! val)
+      (set-machine-lo! val))
+
+    ;; get/set hi
+    (define/public (get-hi)
+      (machine-hi m))
+    (define/public (set-hi! val)
+      (set-machine-hi! val))
+
+    ;; step once
+    (define/public (step!)
+      (step-machine! m))
+
+    ;; step until
+    (define/public (step!/loop)
+      (step-machine!/loop m))
+
+    ;; dump memory
+    (define/public (dump-memory path)
+      (dump-memory/fn m path))
+    ))

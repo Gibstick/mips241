@@ -9,12 +9,15 @@ add_custom_target(copy_racket_frontends ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory "{CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/racket"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/bindings.rkt" "${CMAKE_BINARY_DIR}/racket/bindings.rkt"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/frontend.rkt" "${CMAKE_BINARY_DIR}/racket/frontend.rkt"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/custom.rkt" "${CMAKE_BINARY_DIR}/racket/custom.rkt"
 )
 
 add_custom_target(racket_basic_frontend ALL
     DEPENDS copy_racket_frontends
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/racket"
-    COMMAND ${RACKET} -l raco/main make bindings.rkt frontend.rkt
+    COMMAND ${RACKET} -l raco/main make bindings.rkt frontend.rkt custom.rkt
     COMMAND ${RACKET} -l raco/main exe -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.basic" frontend.rkt
+    COMMAND ${RACKET} -l raco/main exe -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.custom" ++lib racket/lang/reader custom.rkt
     COMMENT "Compiling Racket frontends"
 )
+
