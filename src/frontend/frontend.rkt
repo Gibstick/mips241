@@ -67,14 +67,16 @@ Stuff that is common to all frontends.
 (define load-address (make-parameter 0))
 
 ;; Main function. Frontends will call this function to actually do stuff.
-;;   init-fn is a (_Machine -> Void). It does setup,
+;;   init-fn is a (machine% -> Void). It does setup,
 ;;   for example reading in two integers and placing them in $1 and $2.
 ;;
-;;   post-fn is a (_Machine emualtor-status -> Void). It does stuff once the
+;;   post-fn is a (machine% emulator-status -> Void). It does stuff once the
 ;;   program has finished. By default, it prints out all the registers.
 ;;
 ;;   help-strings is a list of strings to display when the help flag is given
 ;;   on the command line. Each string will be printed on its own line.
+;;
+;;   once-each: DO NOT USE YET
 (define (start #:init-fn [init-fn (lambda (m) (void))]
                #:post-fn [post-fn default-post-fn]
                #:help-strings [help-strings empty]
