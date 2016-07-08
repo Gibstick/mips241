@@ -10,8 +10,8 @@ if (SH)
     add_test(
         NAME "racket-basic-test"
         COMMAND ${SH} ${CMAKE_CURRENT_SOURCE_DIR}/runtest.sh 
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/bin/mips241.legacy
-        {CMAKE_CURRENT_SOURCE_DIR}/basic/basic.config
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.legacy
+        ${CMAKE_CURRENT_SOURCE_DIR}/basic/basic.config
         racket
     )
 endif()

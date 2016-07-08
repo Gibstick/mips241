@@ -12,8 +12,8 @@ while read stem; do
     OUTFILE=$(mktemp)
     EXPECTFILE="$path_prefix/expect/${stem}.expect"
 
-    if [ ${3} == "racket" ]; then
-        "${1} ${path_prefix}/${stem}.mips" > "${OUTFILE}" 2>&1 
+    if [ "${3}" = "racket" ]; then
+        "${1}" - < "${path_prefix}/${stem}.mips" > "${OUTFILE}" 2>&1
     else
         "${1}" < "${path_prefix}/${stem}.mips" > "${OUTFILE}" 2>&1 
     fi
