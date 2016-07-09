@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 
 #|
 Definitions and bindings for everything needed to interact
@@ -12,7 +12,8 @@ Basically, the following files need to be "ported":
 
 (require ffi/unsafe
          ffi/unsafe/define
-         ffi/unsafe/alloc)
+         ffi/unsafe/alloc
+         racket/class)
 
 (provide num-registers
          (struct-out emulator-status)
@@ -23,7 +24,7 @@ Basically, the following files need to be "ported":
 ;; 1. same dir as the racket binary
 ;; 2. ../lib
 (define get-paths-for-lib
-  (const
+  (lambda ()
    (list (simplify-path (build-path (find-system-path 'run-file) 'up))
          (simplify-path (build-path (find-system-path 'run-file) 'up 'up "lib")))))
 

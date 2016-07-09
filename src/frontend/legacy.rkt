@@ -1,6 +1,9 @@
-#lang racket
+#lang racket/base
 
-(require "frontend.rkt")
+(require "frontend.rkt"
+         racket/list
+         racket/format
+         racket/class)
 
 ;; Prints all registers in a legacy format
 (define (print-registers/legacy m)

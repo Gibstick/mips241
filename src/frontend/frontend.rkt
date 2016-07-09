@@ -1,9 +1,14 @@
-#lang racket
+#!/usr/bin/env racket
+#lang racket/base
 #|
 Stuff that is common to all frontends.
 |#
 
-(require racket/contract
+(require racket/string ; string-join
+         racket/format ; ~a
+         racket/class  ; send
+         racket/list   ; range, list, etc
+         racket/cmdline
          (only-in ffi/unsafe
                   array-ref
                   ptr-set!
@@ -54,7 +59,7 @@ Stuff that is common to all frontends.
       [(idx . >= . return-address)
        (error "Your program goes past the return address. Exiting.")]
       [else
-       (send m set-mem! idx (integer-bytes->integer word false true))
+       (send m set-mem! idx (integer-bytes->integer word #f #t))
        (loop (read-bytes 4 in) (add1 idx))]))
   (send m set-pc! offset)
   (send m set-reg! 31 return-address))
@@ -64,7 +69,7 @@ Stuff that is common to all frontends.
   (displayln (emulator-status-retcode status)))
 
 ;; Params for start
-(define display-version (make-parameter false))
+(define display-version (make-parameter #f))
 (define load-address (make-parameter 0))
 
 ;; Main function. Frontends will call this function to actually do stuff.
@@ -91,7 +96,7 @@ Stuff that is common to all frontends.
   (define flaglist
     (list* 'once-each
            `[("--version")
-             ,(lambda (f) (display-version true))
+             ,(lambda (f) (display-version #t))
              ("Display the version number")]
            `[("-l" "--load-at")
              ,(lambda (f addr) (load-address (string->number addr)))
@@ -104,7 +109,7 @@ Stuff that is common to all frontends.
      (current-command-line-arguments)
      `(,flaglist
        ,ps-list)
-     (lambda (flag-accum [filename false]) filename)
+     (lambda (flag-accum [filename #f]) filename)
      '("filename")))
 
   (when (display-version)
@@ -122,7 +127,7 @@ Stuff that is common to all frontends.
       (load-program! m (load-address))
       (with-input-from-file
           filename
-        (thunk (load-program! m (load-address)))))
+        (lambda () (load-program! m (load-address)))))
 
   (define status (send m step!/loop))
 
