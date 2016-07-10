@@ -20,6 +20,12 @@ the groundwork has been laid out.
 
 # Building
 
+The project has external dependencies as git submodules. Use `--recursive`
+as a flag to `git clone`. If you have already cloned,
+```sh
+git submodule init && git submodule update
+```
+
 This project uses CMake. Prefer an out-of-tree build.
 
 For example, from the top-level directory of this project, with clang,
