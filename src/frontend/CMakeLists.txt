@@ -11,6 +11,7 @@ add_custom_target(copy_racket_frontends ALL
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/frontend.rkt" "${CMAKE_BINARY_DIR}/racket/frontend.rkt"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/custom.rkt" "${CMAKE_BINARY_DIR}/racket/custom.rkt"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/legacy.rkt" "${CMAKE_BINARY_DIR}/racket/legacy.rkt"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/guess-file-type.rkt" "${CMAKE_BINARY_DIR}/racket/guess-file-type.rkt"
 )
 
 add_custom_target(racket_frontends ALL
