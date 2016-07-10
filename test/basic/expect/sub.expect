@@ -28,6 +28,6 @@ register 26: 0x00000000
 register 27: 0x00000000
 register 28: 0x00000000
 register 29: 0x00000000
-register 30: 0x00000000
+register 30: 0x01000000
 register 31: 0x8123456c
 Program completed successfully.

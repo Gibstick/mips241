@@ -24,6 +24,7 @@ Stuff that is common to all frontends.
 
 (define version "0.1")
 (define return-address #x8123456c)
+(define stack-address #x01000000)
 
 
 ;; Prints all registers of a Machine.
@@ -47,21 +48,21 @@ Stuff that is common to all frontends.
 ;;   reading input from the port in
 ;; Requires: Non-null Machine pointer
 (define (load-program! m offset [in (current-input-port)])
-  (unless m
-    (error "Null pointer??? Bye."))
-  (let loop
-    ([word (read-bytes 4 in)]
-     [idx (/ offset 4)])
-    (cond
-      [(eof-object? word) (void)]
-      [(idx . >= . (send m get-mem-size))
-       (error "Your program is too big. Exiting.")]
-      [(idx . >= . return-address)
-       (error "Your program goes past the return address. Exiting.")]
-      [else
-       (send m set-mem! idx (integer-bytes->integer word #f #t))
-       (loop (read-bytes 4 in) (add1 idx))]))
+  (define end-address
+    (let loop
+      ([word (read-bytes 4 in)]
+       [idx (/ offset 4)])
+      (cond
+        [(eof-object? word) (* 4 idx)]
+        [(idx . >= . (send m get-mem-size))
+         (error "Your program is too big. Exiting.")]
+        [(idx . >= . return-address)
+         (error "Your program goes past the return address. Exiting.")]
+        [else
+         (send m set-mem! idx (integer-bytes->integer word #f #t))
+         (loop (read-bytes 4 in) (add1 idx))])))
   (send m set-pc! offset)
+  (send m set-reg! 30 (max end-address stack-address))
   (send m set-reg! 31 return-address))
 
 (define (default-post-fn m status)
