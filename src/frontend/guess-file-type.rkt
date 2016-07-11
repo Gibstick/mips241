@@ -21,25 +21,24 @@ machine code or ascii
                          #:limit-bytes [limit-bytes 32]
                          #:threshold [threshold 0.95])
   (parameterize ([current-input-port in])
-    (lambda ()
-      (let loop ([byte (read-byte)]
-                 [limit-bytes limit-bytes]
-                 [printable-bytes 0]
-                 [total-bytes 0])
-        (cond [(and (zero? total-bytes)
-                    (eof-object? byte))
-               'binary]
-              [(or (zero? limit-bytes)
-                   (eof-object? byte))
-               (if (and (not (zero? printable-bytes))
-                        (>= (/ printable-bytes total-bytes)
-                            threshold))
-                 'ascii
-                 'binary)]
-              [(loop (read-byte)
-                     (sub1 limit-bytes)
-                     (if (printable? byte) (add1 printable-bytes) printable-bytes)
-                     (add1 total-bytes))])))))
+    (let loop ([byte (read-byte)]
+               [limit-bytes limit-bytes]
+               [printable-bytes 0]
+               [total-bytes 0])
+      (cond [(and (zero? total-bytes)
+                  (eof-object? byte))
+             'binary]
+            [(or (zero? limit-bytes)
+                 (eof-object? byte))
+             (if (and (not (zero? printable-bytes))
+                      (>= (/ printable-bytes total-bytes)
+                          threshold))
+               'ascii
+               'binary)]
+            [(loop (read-byte)
+                   (sub1 limit-bytes)
+                   (if (printable? byte) (add1 printable-bytes) printable-bytes)
+                   (add1 total-bytes))]))))
 
 ;; Returns true if the byte is printable ascii
 (define (printable? byte)

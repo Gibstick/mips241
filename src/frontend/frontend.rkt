@@ -9,7 +9,7 @@ Stuff that is common to all frontends.
          racket/class  ; send
          racket/list   ; range, list, etc
          racket/cmdline
-         racket/function ; curry
+         racket/port
          (only-in ffi/unsafe
                   array-ref
                   ptr-set!
@@ -133,14 +133,16 @@ Stuff that is common to all frontends.
   ;; set up ports
   (define in-port
     (if (not (equal? filename "-"))
-      (open-input-file filename 'binary)
+      (open-input-file filename #:mode 'binary)
       (current-input-port)))
 
   (define stdin? (equal? filename "-"))
 
   ;; guess file type if necessary
-  (when stdin?
+  (unless stdin?
     (file-type (guess-file-type in-port)))
+
+  (eprintf "File type: ~a\n" (file-type))
 
   ;; assume stdin is machine code
 
@@ -152,9 +154,16 @@ Stuff that is common to all frontends.
       [stdin?
         (values #f in-port #f #f)]
       [else
-        (subprocess #f in-port #f "java" "cs241.binasm")]))
+        (subprocess #f in-port #f (find-executable-path "java") "cs241.binasm")]))
+
+  (and subproc (subprocess-wait subproc))
+
+  (displayln (port->bytes proc-err))
+  (displayln (port->bytes proc-out))
 
   (load-program! m (load-address) proc-out)
+  
+  (send m dump-memory "dump")
 
   (and subproc (subprocess-wait subproc))
 
@@ -168,6 +177,8 @@ Stuff that is common to all frontends.
   (and proc-out (close-input-port proc-out))
   (and proc-in (close-output-port proc-in))
   (and proc-err (close-input-port proc-err))
+  (close-input-port in-port)
+  (void)
   )
 
 (module+ main
