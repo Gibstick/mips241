@@ -153,12 +153,9 @@ Stuff that is common to all frontends.
       [(or stdin? (equal? (file-type) 'binary))
         (values #f in-port #f #f)]
       [else
-        (eprintf "Subprocess!\n")
         (subprocess #f in-port #f (find-executable-path "java") "cs241.binasm")]))
 
   (load-program! m (load-address) proc-out)
-  
-  (send m dump-memory "dump")
 
   (and subproc (subprocess-wait subproc))
 
