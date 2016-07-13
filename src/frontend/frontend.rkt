@@ -140,9 +140,8 @@ Stuff that is common to all frontends.
 
   ;; guess file type if necessary
   (unless stdin?
-    (file-type (guess-file-type in-port)))
-
-  (eprintf "File type: ~a\n" (file-type))
+    (with-input-from-file filename
+      (lambda () (file-type (guess-file-type)))))
 
   ;; assume stdin is machine code
 
@@ -151,15 +150,11 @@ Stuff that is common to all frontends.
                   proc-in
                   proc-err)
     (cond 
-      [stdin?
+      [(or stdin? (equal? (file-type) 'binary))
         (values #f in-port #f #f)]
       [else
+        (eprintf "Subprocess!\n")
         (subprocess #f in-port #f (find-executable-path "java") "cs241.binasm")]))
-
-  (and subproc (subprocess-wait subproc))
-
-  (displayln (port->bytes proc-err))
-  (displayln (port->bytes proc-out))
 
   (load-program! m (load-address) proc-out)
   
