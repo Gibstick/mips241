@@ -1,6 +1,5 @@
 find_program(RACKET racket
     PATHS /usr/racket/bin)
-
 if (NOT RACKET)
     message(FATAL_ERROR "Racket was not found.")
 endif()
@@ -24,3 +23,7 @@ add_custom_target(racket_frontends ALL
     COMMENT "Compiling Racket frontends"
 )
 
+add_test(
+    NAME guess-file-type
+    COMMAND ${RACKET} -l raco/main test "${CMAKE_CURRENT_SOURCE_DIR}/guess-file-type.rkt"
+)

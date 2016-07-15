@@ -5,6 +5,8 @@ machine code or ascii
 
 #lang racket/base
 
+(require syntax/parse/define) ; define-simple-macro
+
 (provide guess-file-type)
 
 ;; Guesses the file type of port `in'.
@@ -40,8 +42,29 @@ machine code or ascii
                    (if (printable? byte) (add1 printable-bytes) printable-bytes)
                    (add1 total-bytes))]))))
 
+
 ;; Returns true if the byte is printable ascii
-(define (printable? byte)
+
+(define-simple-macro (printable? byte:expr)
   (or (and (>= byte 32)
            (<= byte 127))
       (= byte 10)))
+
+(module+ test
+  (require rackunit)
+  ;; null bytes aren't special, I'm just too lazy to type another non-ascii char
+  (check-eq?
+    (call-with-input-file (find-executable-path "cp")
+      guess-file-type)
+    'binary)
+  (check-eq? (guess-file-type (open-input-bytes #"abcdef"))
+             'ascii)
+  (check-eq? (guess-file-type (open-input-bytes #""))
+             'binary)
+  (check-eq? (guess-file-type (open-input-bytes #"abc\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"))
+             'binary)
+  (check-eq? (guess-file-type (open-input-bytes #"hello world!\n\n\n\n\n"))
+             'ascii)
+  (check-eq? (guess-file-type (open-input-bytes #"\n")) 'ascii)
+  (check-eq? (guess-file-type (open-input-bytes #"\0abc\0")) 'binary)
+  )
