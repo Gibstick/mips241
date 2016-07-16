@@ -75,6 +75,7 @@ Stuff that is common to all frontends.
 (define display-version (make-parameter #f))
 (define load-address (make-parameter 0))
 (define file-type (make-parameter #f))
+(define assembler (make-parameter "java cs241.binasm"))
 
 ;; Main function. Frontends will call this function to actually do stuff.
 ;;   init-fn is a (machine% -> Void). It does setup,
@@ -108,6 +109,9 @@ Stuff that is common to all frontends.
            `[("-t" "--type")
              ,(lambda (f type) (file-type (string->symbol type)))
              ("Manually specify the file type as binary or ascii" "type")]
+           `[("-a" "--assembler")
+             ,(lambda (f as) (assembler as))
+             ("Program and arguments to be invoked for assembling" "assembler")]
            once-each))
 
   (define filename
@@ -149,15 +153,35 @@ Stuff that is common to all frontends.
                   proc-out
                   proc-in
                   proc-err)
-    (cond 
+    (cond
       [(or stdin? (equal? (file-type) 'binary))
         (values #f in-port #f #f)]
       [else
-        (subprocess #f in-port #f (find-executable-path "java") "cs241.binasm")]))
+        ;; check for empty string
+        (when (string=? (assembler) "")
+          (raise-user-error 'start "Invalid path to assembler ~s"
+                            (assembler)))
+
+        (define split-path (string-split (assembler)))
+        (define as-path (find-executable-path (first split-path)))
+        (define as-args (string-join (rest split-path)))
+
+        (unless as-path
+          (raise-user-error 'start
+                            "Assembler ~s not found in PATH"
+                            (first split-path)))
+
+        (subprocess #f in-port #f as-path as-args)]))
 
   (load-program! m (load-address) proc-out)
 
   (and subproc (subprocess-wait subproc))
+
+  (unless (zero? (subprocess-status subproc))
+    (raise-user-error 'start
+                      "Assembler returned with nonzero status ~a\n~a"
+                      (port->string proc-err)
+                      (subprocess-status subproc)))
 
   (init-fn m)
 
