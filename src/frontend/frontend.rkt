@@ -71,6 +71,17 @@ Stuff that is common to all frontends.
   (print-registers m)
   (displayln (emulator-status-retcode status)))
 
+
+;; Workaround: parse-command-line does not
+;; work with ps-strings, so we define our own
+;; help function closure to print the ps-strings
+(define (make-help-fn ps-list)
+  (lambda (s)
+    (display s)
+    (for ([line (in-list ps-list)])
+      (displayln line))
+    (exit 0)))
+
 ;; Params for start
 (define display-version (make-parameter #f))
 (define load-address (make-parameter 0))
@@ -96,7 +107,7 @@ Stuff that is common to all frontends.
   (define m (new machine%))
 
   (define ps-list
-    (list* 'ps "" "Frontend description:" help-strings))
+    (list* "" "Frontend description:" help-strings))
 
   (define flaglist
     (list* 'once-each
@@ -118,10 +129,12 @@ Stuff that is common to all frontends.
     (parse-command-line
      (find-system-path 'run-file)
      (current-command-line-arguments)
-     `(,flaglist
-       ,ps-list)
+     `(,flaglist)
      (lambda (flag-accum [filename #f]) filename)
-     '("filename")))
+     '("filename")
+     (make-help-fn ps-list)
+     ))
+
 
 
   ;; short-circuit and display version if -v
