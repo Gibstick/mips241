@@ -1,4 +1,4 @@
-#!/usr/bin/env sh 
+#!/usr/bin/env sh
 
 # Smells like runscript from CS246
 
@@ -8,20 +8,20 @@ failed=0
 path_prefix=$(realpath $(dirname "${2}"))
 # other test files are relative to $path_prefix
 
-while read stem; do
+while read filename; do
     OUTFILE=$(mktemp)
-    EXPECTFILE="$path_prefix/expect/${stem}.expect"
-
+    STEM=${filename%.*}
+    EXPECTFILE="$path_prefix/expect/${STEM}.expect"
     if [ "${3}" = "racket" ]; then
-        "${1}" - < "${path_prefix}/${stem}.mips" > "${OUTFILE}" 2>&1
+        "${1}" "${path_prefix}/${filename}" > "${OUTFILE}" 2>&1
     else
-        "${1}" < "${path_prefix}/${stem}.mips" > "${OUTFILE}" 2>&1 
+        "${1}" < "${path_prefix}/${filename}" > "${OUTFILE}" 2>&1
     fi
 
     cmp "${OUTFILE}" "${EXPECTFILE}"
     if [ "${?}" -ne 0 ]; then
-        echo "Test ${stem} failed!"
-        diff "${OUTFILE}" "${EXPECTFILE}"
+        echo "Test ${STEM} failed!"
+        diff -y "${OUTFILE}" "${EXPECTFILE}"
         failed=1
     fi
 
