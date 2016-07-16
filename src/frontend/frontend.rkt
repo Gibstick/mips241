@@ -9,12 +9,14 @@ Stuff that is common to all frontends.
          racket/class  ; send
          racket/list   ; range, list, etc
          racket/cmdline
+         racket/port
          (only-in ffi/unsafe
                   array-ref
                   ptr-set!
                   _uint32
                   array-set!)
-         "bindings.rkt")
+         "bindings.rkt"
+         "guess-file-type.rkt")
 
 (provide load-program!
          default-post-fn
@@ -72,6 +74,8 @@ Stuff that is common to all frontends.
 ;; Params for start
 (define display-version (make-parameter #f))
 (define load-address (make-parameter 0))
+(define file-type (make-parameter #f))
+(define assembler (make-parameter "java cs241.binasm"))
 
 ;; Main function. Frontends will call this function to actually do stuff.
 ;;   init-fn is a (machine% -> Void). It does setup,
@@ -102,6 +106,12 @@ Stuff that is common to all frontends.
            `[("-l" "--load-at")
              ,(lambda (f addr) (load-address (string->number addr)))
              ("Load the program at <address>" "address")]
+           `[("-t" "--type")
+             ,(lambda (f type) (file-type (string->symbol type)))
+             ("Manually specify the file type as binary or ascii" "type")]
+           `[("-a" "--assembler")
+             ,(lambda (f as) (assembler as))
+             ("Program and arguments to be invoked for assembling" "assembler")]
            once-each))
 
   (define filename
@@ -113,6 +123,8 @@ Stuff that is common to all frontends.
      (lambda (flag-accum [filename #f]) filename)
      '("filename")))
 
+
+  ;; short-circuit and display version if -v
   (when (display-version)
     (displayln version)
     (exit))
@@ -122,17 +134,68 @@ Stuff that is common to all frontends.
     (displayln "For input from standard input, give '-' as the filename." (current-error-port))
     (exit 1))
 
-  (init-fn m)
+  ;; set up ports
+  (define in-port
+    (if (not (equal? filename "-"))
+      (open-input-file filename #:mode 'binary)
+      (current-input-port)))
 
-  (if (equal? filename "-")
-      (load-program! m (load-address))
-      (with-input-from-file
-          filename
-        (lambda () (load-program! m (load-address)))))
+  (define stdin? (equal? filename "-"))
+
+  ;; guess file type if necessary
+  (unless stdin?
+    (with-input-from-file filename
+      (lambda () (file-type (guess-file-type)))))
+
+  ;; assume stdin is machine code
+
+  (define-values (subproc
+                  proc-out
+                  proc-in
+                  proc-err)
+    (cond
+      [(or stdin? (equal? (file-type) 'binary))
+        (values #f in-port #f #f)]
+      [else
+        ;; check for empty string
+        (when (string=? (assembler) "")
+          (raise-user-error 'start "Invalid path to assembler ~s"
+                            (assembler)))
+
+        (define split-path (string-split (assembler)))
+        (define as-path (find-executable-path (first split-path)))
+        (define as-args (string-join (rest split-path)))
+
+        (unless as-path
+          (raise-user-error 'start
+                            "Assembler ~s not found in PATH"
+                            (first split-path)))
+
+        (subprocess #f in-port #f as-path as-args)]))
+
+  (load-program! m (load-address) proc-out)
+
+  (and subproc (subprocess-wait subproc))
+
+  (unless (zero? (subprocess-status subproc))
+    (raise-user-error 'start
+                      "Assembler returned with nonzero status ~a\n~a"
+                      (port->string proc-err)
+                      (subprocess-status subproc)))
+
+  (init-fn m)
 
   (define status (send m step!/loop))
 
-  (post-fn m status))
+  (post-fn m status)
+
+  ;; close ports
+  (and proc-out (close-input-port proc-out))
+  (and proc-in (close-output-port proc-in))
+  (and proc-err (close-input-port proc-err))
+  (close-input-port in-port)
+  (void)
+  )
 
 (module+ main
   (start #:help-strings

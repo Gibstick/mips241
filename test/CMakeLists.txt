@@ -9,11 +9,20 @@ if (SH)
 
     add_test(
         NAME "racket-basic-test"
-        COMMAND ${SH} ${CMAKE_CURRENT_SOURCE_DIR}/runtest.sh 
+        COMMAND ${SH} ${CMAKE_CURRENT_SOURCE_DIR}/runtest.sh
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.legacy
         ${CMAKE_CURRENT_SOURCE_DIR}/basic/basic.config
         racket
     )
+
+    add_test(
+        NAME "auto-assemble-test"
+        COMMAND ${SH} ${CMAKE_CURRENT_SOURCE_DIR}/runtest.sh
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.legacy
+        ${CMAKE_CURRENT_SOURCE_DIR}/ascii/ascii.config
+        racket
+    )
+
 endif()
 
 add_subdirectory(unit)

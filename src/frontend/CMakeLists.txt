@@ -1,6 +1,5 @@
 find_program(RACKET racket
     PATHS /usr/racket/bin)
-
 if (NOT RACKET)
     message(FATAL_ERROR "Racket was not found.")
 endif()
@@ -11,6 +10,7 @@ add_custom_target(copy_racket_frontends ALL
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/frontend.rkt" "${CMAKE_BINARY_DIR}/racket/frontend.rkt"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/custom.rkt" "${CMAKE_BINARY_DIR}/racket/custom.rkt"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/legacy.rkt" "${CMAKE_BINARY_DIR}/racket/legacy.rkt"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/guess-file-type.rkt" "${CMAKE_BINARY_DIR}/racket/guess-file-type.rkt"
 )
 
 add_custom_target(racket_frontends ALL
@@ -23,3 +23,7 @@ add_custom_target(racket_frontends ALL
     COMMENT "Compiling Racket frontends"
 )
 
+add_test(
+    NAME guess-file-type
+    COMMAND ${RACKET} -l raco/main test "${CMAKE_CURRENT_SOURCE_DIR}/guess-file-type.rkt"
+)
