@@ -15,13 +15,15 @@ if (SH)
         racket
     )
 
-    add_test(
-        NAME "auto-assemble-test"
-        COMMAND ${SH} ${CMAKE_CURRENT_SOURCE_DIR}/runtest.sh
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.legacy
-        ${CMAKE_CURRENT_SOURCE_DIR}/ascii/ascii.config
-        racket
-    )
+    if (TEST_AUTO_ASSEMBLE)
+        add_test(
+            NAME "auto-assemble-test"
+            COMMAND ${SH} ${CMAKE_CURRENT_SOURCE_DIR}/runtest.sh
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.legacy
+            ${CMAKE_CURRENT_SOURCE_DIR}/ascii/ascii.config
+            racket
+        )
+    endif()
 
 endif()
 
