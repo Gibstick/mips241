@@ -190,7 +190,8 @@ Stuff that is common to all frontends.
 
   (and subproc (subprocess-wait subproc))
 
-  (unless (zero? (subprocess-status subproc))
+  (unless (or (not subproc)
+              (zero? (subprocess-status subproc)))
     (raise-user-error 'start
                       "Assembler returned with nonzero status ~a\n~a"
                       (port->string proc-err)
