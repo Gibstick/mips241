@@ -156,7 +156,7 @@ Stuff that is common to all frontends.
   (define stdin? (equal? filename "-"))
 
   ;; guess file type if necessary
-  (unless stdin?
+  (unless (or stdin? (file-type))
     (with-input-from-file filename
       (lambda () (file-type (guess-file-type)))))
 
