@@ -12,7 +12,7 @@ machine code or ascii
 ;; Guesses the file type of port `in'.
 ;; Returns either 'ascii or 'binary. If the file is empty, it returns
 ;; 'binary.'
-;; 
+;;
 ;; limit-bytes is the number of bytes used to sample the file.
 ;; if limit-bytes is larger than the file size, only the entire file
 ;; is used.

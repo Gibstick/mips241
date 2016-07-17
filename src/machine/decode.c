@@ -16,7 +16,7 @@ Instruction decode_instruction(uint32_t word) {
         return (Instruction) {
             .type = TYPE_R,
             .decoded = {.r = { .d = d, .s = s, .t = t }},
-            .code = func 
+            .code = func
         };
     } else {
         return (Instruction) {
@@ -26,6 +26,6 @@ Instruction decode_instruction(uint32_t word) {
         };
     }
 
-    
-    // Note: invalid instructions will be caught at dispatch 
+
+    // Note: invalid instructions will be caught at dispatch
 }

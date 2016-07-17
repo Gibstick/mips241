@@ -24,7 +24,7 @@
     [(IR_INVALID_INSTRUCTION) "An invalid instruction was encountered."]
     [else "Unknown error!"]))
 
-    
+
 (define (post-fn m status)
   (print-registers/legacy m)
   (displayln (emulator-status->string status)))

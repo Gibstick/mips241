@@ -9,10 +9,10 @@
 #include <stdint.h>
 
 #define NUM_WORDS_MEMORY 4194304 // 16 MB of RAM by default
-#define NUM_REGISTERS 32         // does not include pc, ir, lo, hi 
+#define NUM_REGISTERS 32         // does not include pc, ir, lo, hi
 
 typedef struct Machine {
-    uint32_t *mem;      // array of words of memory  
+    uint32_t *mem;      // array of words of memory
     uint32_t mem_size;  // size of the above
     uint32_t registers[NUM_REGISTERS];
     uint32_t pc;        // need to divide by 4 if we want to index registers
@@ -20,11 +20,11 @@ typedef struct Machine {
     uint32_t lo;
 } Machine;
 
-// Returns a pointer to a ready-to-use struct representing 
+// Returns a pointer to a ready-to-use struct representing
 //   the underlying MIPS machine.
 //   If max_memory is nonzero, then this amount of memory
 //   is given to the machine in bytes. Otherwise,
-//   the default amount of memory is used. 
+//   the default amount of memory is used.
 // Requires: max_memory_bytes is divisible by 4
 Machine *init_machine(uint32_t max_memory_bytes);
 

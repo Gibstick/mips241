@@ -1,6 +1,6 @@
 #ifndef UTIL_H__
 #define UTIL_H__
-// Utility functions 
+// Utility functions
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -17,16 +17,16 @@
         #endif
     #endif
 #else
-    #define noreturn 
+    #define noreturn
 #endif
 
 // Make the program give up on life. Before that,
-//   it frees memory and prints out message, then exits with status. 
+//   it frees memory and prints out message, then exits with status.
 static inline noreturn void give_up(const char *message, int status, Machine *machine) {
     m_print_registers(machine);
     destroy_machine(machine);
     fprintf(stderr, "%s\n", message);
-    exit(status); 
+    exit(status);
 }
 
 // Make the program give up if the condition is not true.
