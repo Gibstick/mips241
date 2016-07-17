@@ -43,7 +43,10 @@ Stuff that is common to all frontends.
                          (send m get-reg reg))))
            (range i (min (+ i 4) num-registers)))
       "  ")
-     (current-error-port))))
+     (current-error-port)))
+  (displayln (format "$pc = 0x~a"
+                      (~r #:base 16 #:min-width 8 #:pad-string "0"
+                          (send m get-pc)))))
 
 
 ;; Load a program into a machine at offset,
@@ -87,6 +90,7 @@ Stuff that is common to all frontends.
 (define load-address (make-parameter 0))
 (define file-type (make-parameter #f))
 (define assembler (make-parameter "java cs241.binasm"))
+(define single-step? (make-parameter #f))
 
 ;; Main function. Frontends will call this function to actually do stuff.
 ;;   init-fn is a (machine% -> Void). It does setup,
@@ -111,9 +115,9 @@ Stuff that is common to all frontends.
 
   (define flaglist
     (list* 'once-each
-           `[("--version")
-             ,(lambda (f) (display-version #t))
-             ("Display the version number")]
+           `[("-s" "--single-step")
+             ,(lambda (f) (single-step? #t))
+             ("Enable single-stepping mode")]
            `[("-l" "--load-at")
              ,(lambda (f addr) (load-address (string->number addr)))
              ("Load the program at <address>" "address")]
@@ -123,6 +127,9 @@ Stuff that is common to all frontends.
            `[("-a" "--assembler")
              ,(lambda (f as) (assembler as))
              ("Program and arguments to be invoked for assembling" "assembler")]
+           `[("--version")
+             ,(lambda (f) (display-version #t))
+             ("Display the version number")]
            once-each))
 
   (define filename
@@ -159,6 +166,7 @@ Stuff that is common to all frontends.
   (unless (or stdin? (file-type))
     (with-input-from-file filename
       (lambda () (file-type (guess-file-type)))))
+  (printf "file type: ~a\n" (file-type))
 
   ;; assume stdin is machine code
 
