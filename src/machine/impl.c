@@ -1,211 +1,193 @@
 #include <assert.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "common/defs.h"
 #include "machine/impl.h"
 #include "machine/machine.h"
+#include "machine/decode.h"
+#include "util/util.h"
 
 // Macros
-#define ASSIGN_RTYPE_TABLE(ID) \
-    do { \
-        RTYPE_TABLE[FUNC_##ID] = ID##_impl; \
-    } while(0)
-
-#define ASSIGN_ITYPE_TABLE(ID) \
-    do { \
-        ITYPE_TABLE[OP_##ID] = immediate_impl; \
-    } while(0)
-
-#define R_REG(REGISTER) m->registers[ins->decoded.r.REGISTER]
-#define I_REG(REGISTER) m->registers[ins->decoded.i.REGISTER]
-#define M_REG(REGISTER) m->registers[REGISTER]
+#define R_REG(REGISTER) machine->registers[ins.decoded.r.REGISTER]
+#define I_REG(REGISTER) machine->registers[ins.decoded.i.REGISTER]
+#define M_REG(REGISTER) machine->registers[REGISTER]
 
 // Macro for converting a uint32_t to an int32_t safely
 #define make_signed(X) \
        (int32_t)( (X > INT32_MAX) ? X - UINT32_MAX - 1 : X )
 
 // Constants
-static const uint32_t MAPPED_INPUT_ADDR = 0xFFFF000C; 
+static const uint32_t MAPPED_INPUT_ADDR = 0xFFFF000C;
 static const uint32_t MAPPED_OUTPUT_ADDR = 0xFFFF0004;
 
+// Execute one instruction as pointed to by pc.
+// Effects: machine state is modified
+EmulatorStatus step_machine(Machine *const machine) {
+    // Follows the fetch-decode-execute loop taught in CS 241,
+    // more or less.
 
-enum instruction_retcode (*RTYPE_TABLE[RTYPE_TABLE_SIZE]) (Machine * const, const Instruction * const);
-enum instruction_retcode (*ITYPE_TABLE[ITYPE_TABLE_SIZE]) (Machine * const, const Instruction * const);
+    if (machine->pc % 4 != 0)
+        return (EmulatorStatus) {IR_UNALIGNED_INSTRUCTION_FETCH, machine->pc};
 
+    // return value false means the machine has finished
+    if (machine->pc == RETURN_ADDRESS)
+        return (EmulatorStatus) {IR_DONE, machine->pc};
 
-// Invalid opcodes point to this function
-static enum instruction_retcode
-invalid_instruction(Machine * const m, const Instruction * const i) {
-    return IR_INVALID_INSTRUCTION; 
-}
+    // Fetch and decode
+    const Instruction ins = decode_instruction(machine->mem[machine->pc / 4]);
+    machine->pc += 4;
 
-static enum instruction_retcode ADD_impl(Machine * const m, const Instruction * const ins) {
-    R_REG(d) = R_REG(s) + R_REG(t);
-    return IR_SUCCESS;
-}
+    // because I don't want to indent more
+    switch (ins.type) {
+        case TYPE_R:
+            goto DO_RTYPE;
+        case TYPE_I:
+            goto DO_ITYPE;
+        default:
+            give_up("Internal emulator error: Invalid instruction return code. Bye.", 1, machine);
+            assert(false); // squelch warnings
+    }
 
-static enum instruction_retcode SUB_impl(Machine * const m, const Instruction * const ins) {
-    R_REG(d) = R_REG(s) - R_REG(t);
-    return IR_SUCCESS;
-}
+DO_RTYPE:;
+    switch (ins.code) {
+        case FUNC_ADD:
+        {
+            R_REG(d) = R_REG(s) + R_REG(t);
+            break;
+        }
 
-static enum instruction_retcode MULTU_impl(Machine * const m, const Instruction * const ins)
-{
-    const uint64_t result = (int64_t)R_REG(s) * R_REG(t);
-    m->hi = result >> 32;
-    m->lo = result & 0xFFFFFFFF;
-    return IR_SUCCESS;
-}
+        case FUNC_SUB:
+        {
+            R_REG(d) = R_REG(s) - R_REG(t);
+            break;
+        }
 
-static enum instruction_retcode MULT_impl(Machine * const m, const Instruction * const ins)
-{
-    const uint64_t result = (int64_t)make_signed(R_REG(s)) * make_signed(R_REG(t));
-    m->hi = result >> 32;
-    m->lo = result & 0xFFFFFFFF;
-    return IR_SUCCESS;
-}
+        case FUNC_MULTU:
+        {
+            const uint64_t result = (int64_t)R_REG(s) * R_REG(t);
+            machine->hi = result >> 32;
+            machine->lo = result & 0xFFFFFFFF;
+            break;
+        }
 
-static enum instruction_retcode DIV_impl(Machine * const m, const Instruction * const ins)
-{
-    m->lo = make_signed(R_REG(s)) / make_signed(R_REG(t));
-    m->hi = make_signed(R_REG(s)) % make_signed(R_REG(t));
-    return IR_SUCCESS;
-}
+        case FUNC_MULT:
+        {
+            const uint64_t result = (int64_t)make_signed(R_REG(s)) * make_signed(R_REG(t));
+            machine->hi = result >> 32;
+            machine->lo = result & 0xFFFFFFFF;
+            break;
+        }
 
-static enum instruction_retcode DIVU_impl(Machine * const m, const Instruction * const ins)
-{
-    m->lo = R_REG(s) / R_REG(t);
-    m->hi = R_REG(s) % R_REG(t);
-    return IR_SUCCESS;
-}
+        case FUNC_DIV:
+        {
+            machine->lo = make_signed(R_REG(s)) / make_signed(R_REG(t));
+            machine->hi = make_signed(R_REG(s)) % make_signed(R_REG(t));
+            break;
+        }
 
-static enum instruction_retcode MFLO_impl(Machine * const m, const Instruction * const ins)
-{
-    R_REG(d) = m->lo;  
-    return IR_SUCCESS;
-}
+        case FUNC_DIVU:
+        {
+            machine->lo = R_REG(s) / R_REG(t);
+            machine->hi = R_REG(s) % R_REG(t);
+            break;
+        }
 
-static enum instruction_retcode MFHI_impl(Machine * const m, const Instruction * const ins)
-{
-    R_REG(d) = m->hi;
-    return IR_SUCCESS;
-}
+        case FUNC_MFLO:
+        {
+            R_REG(d) = machine->lo;
+            break;
+        }
 
-static enum instruction_retcode LIS_impl(Machine * const m, const Instruction * const ins)
-{
-    R_REG(d) = m->mem[m->pc / 4];
-    m->pc += 4;
-    return IR_SUCCESS;
-}
+        case FUNC_MFHI:
+        {
+            R_REG(d) = machine->hi;
+            break;
+        }
 
-static enum instruction_retcode SLT_impl(Machine * const m, const Instruction * const ins)
-{
-    R_REG(d) = make_signed(R_REG(s)) < make_signed(R_REG(t));
-    return IR_SUCCESS;
-}
+        case FUNC_LIS:
+        {
+            R_REG(d) = machine->mem[machine->pc / 4];
+            machine->pc += 4;
+            break;
+        }
 
-static enum instruction_retcode SLTU_impl(Machine * const m, const Instruction * const ins)
-{
-    R_REG(d) = R_REG(s) < R_REG(t);
-    return IR_SUCCESS;
-}
+        case FUNC_SLT:
+        {
+            R_REG(d) = make_signed(R_REG(s)) < make_signed(R_REG(t));
+            break;
+        }
 
-static enum instruction_retcode JR_impl(Machine * const m, const Instruction * const ins)
-{
-    m->pc = R_REG(s);
-    return IR_SUCCESS;
-}
+        case FUNC_SLTU:
+        {
+            R_REG(d) = R_REG(s) < R_REG(t);
+            break;
+        }
 
-static enum instruction_retcode JALR_impl(Machine * const m, const Instruction * const ins)
-{
-    const uint32_t temp = R_REG(s);
-    M_REG(31) = m->pc;
-    m->pc = temp;
-    return IR_SUCCESS;
-}
+        case FUNC_JR:
+        {
+            machine->pc = R_REG(s);
+            break;
+        }
 
+        case FUNC_JALR:
+        {
+            const uint32_t temp = R_REG(s);
+            M_REG(31) = machine->pc;
+            machine->pc = temp;
+            break;
+        }
+    }
+    goto FINISH;
 
-static enum instruction_retcode
-immediate_impl(Machine * const m, const Instruction * const ins)
-{
-    const int16_t immediate = ins->decoded.i.imm;
+DO_ITYPE:;
+    const int16_t immediate = ins.decoded.i.imm;
     const int64_t byte_addr = (I_REG(s) + immediate);
     const int64_t word_addr = byte_addr / 4;
 
     // check for bad memory access and return accordingly
-    if (ins->code == OP_LW || ins->code == OP_SW) {
-        if (word_addr < 0 || word_addr >= m->mem_size) {
-            return IR_OUT_OF_RANGE_MEMORY_ACCESS;
+    if (ins.code == OP_LW || ins.code == OP_SW) {
+        if (word_addr < 0 || word_addr >= machine->mem_size) {
+            return (EmulatorStatus) {IR_OUT_OF_RANGE_MEMORY_ACCESS, byte_addr};
         }
         if (byte_addr % 4 == 0) {
-            return IR_UNALIGNED_MEMORY_ACCESS;
+            return (EmulatorStatus) {IR_UNALIGNED_MEMORY_ACCESS, byte_addr};
         }
     }
 
-    switch (ins->code) {
+    switch (ins.code) {
         case OP_LW:
             if (byte_addr == MAPPED_INPUT_ADDR) {
                 // TODO: does the reference emulator do this?
                 int c = getchar();
                 if (c != EOF)
-                    m->registers[ins->decoded.i.t] = c;
-            } else
-                I_REG(t) = m->mem[word_addr];
+                    machine->registers[ins.decoded.i.t] = c;
+            } else {
+                I_REG(t) = machine->mem[word_addr];
+            }
             break;
         case OP_SW:
             if (byte_addr == MAPPED_OUTPUT_ADDR)
                 printf("%c", (char) (I_REG(t) & 0xFF));
             else
-                m->mem[word_addr] = I_REG(t);
+                machine->mem[word_addr] = I_REG(t);
 
             break;
         case OP_BEQ:
-            m->pc += (immediate * 4 * I_REG(s) == I_REG(t));
+            machine->pc += (immediate * 4 * I_REG(s) == I_REG(t));
             break;
         case OP_BNE:
-            m->pc += (immediate * 4 * I_REG(s) != I_REG(t));
+            machine->pc += (immediate * 4 * I_REG(s) != I_REG(t));
     }
 
-    return IR_SUCCESS;
+FINISH:
+    machine->registers[0] = 0;
+    return (EmulatorStatus) {IR_SUCCESS, machine->pc};
 }
 
-void init_tables(void) {
-    assert(RTYPE_TABLE_SIZE == ITYPE_TABLE_SIZE);
+EmulatorStatus step_machine_loop(Machine *const machine) {
+    EmulatorStatus status;
+    do status = step_machine(machine);
+    while (status.retcode == IR_SUCCESS);
 
-    for (int i = 0; i < RTYPE_TABLE_SIZE; ++i) {
-        RTYPE_TABLE[i] = invalid_instruction;
-        ITYPE_TABLE[i] = invalid_instruction;
-    }
-
-    ASSIGN_RTYPE_TABLE(ADD);
-    ASSIGN_RTYPE_TABLE(SUB);
-    ASSIGN_RTYPE_TABLE(MULT);
-    ASSIGN_RTYPE_TABLE(MULTU);
-    ASSIGN_RTYPE_TABLE(DIV);
-    ASSIGN_RTYPE_TABLE(DIVU);
-    ASSIGN_RTYPE_TABLE(MFHI);
-    ASSIGN_RTYPE_TABLE(MFLO);
-    ASSIGN_RTYPE_TABLE(LIS);
-    ASSIGN_RTYPE_TABLE(SLT);
-    ASSIGN_RTYPE_TABLE(SLTU);
-    ASSIGN_RTYPE_TABLE(JR);
-    ASSIGN_RTYPE_TABLE(JALR);
-
-    ASSIGN_ITYPE_TABLE(LW);
-    ASSIGN_ITYPE_TABLE(SW);
-    ASSIGN_ITYPE_TABLE(BEQ);
-    ASSIGN_ITYPE_TABLE(BNE);
-
-#ifndef NDEBUG
-    {
-        int rcount = 0;
-        for (int i = 0; i < RTYPE_TABLE_SIZE; ++i)
-            rcount += RTYPE_TABLE[i] != invalid_instruction;
-        assert(rcount == 13);
-
-        int icount = 0;
-        for (int i = 0; i < ITYPE_TABLE_SIZE; ++i)
-            icount += ITYPE_TABLE[i] != invalid_instruction;
-        assert(icount == 4);
-    }
-#endif
+    return status;
 }

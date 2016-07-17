@@ -24,6 +24,8 @@
 #define OP_LW       0x23
 #define OP_SW       0x2B
 
+static const uint32_t RETURN_ADDRESS = 0x8123456c;
+
 typedef struct Instruction {
    enum {
        TYPE_INVALID = 0,
@@ -41,7 +43,7 @@ typedef struct Instruction {
             uint8_t t;
             int16_t imm;
        } i;
-   } decoded;  
+   } decoded;
    uint8_t code; // func or opcode, depending on type
 } Instruction;
 
@@ -52,12 +54,13 @@ enum instruction_retcode {
     IR_UNALIGNED_INSTRUCTION_FETCH,
     IR_OUT_OF_RANGE_MEMORY_ACCESS,
     IR_OUT_OF_RANGE_INSTRUCTION_FETCH,
-    IR_INVALID_INSTRUCTION
+    IR_INVALID_INSTRUCTION,
+    IR_BREAKPOINT
 };
 
 typedef struct EmulatorStatus {
     enum instruction_retcode retcode;
-    uint32_t pc; 
+    uint32_t pc;
 } EmulatorStatus;
 
 #endif

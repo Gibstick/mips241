@@ -10,7 +10,6 @@
 #include "util/util.h"
 #include "common/defs.h"
 
-static const uint32_t RETURN_ADDRESS = 0x8123456c;
 
 // 16 megabytes of memory
 void load_program(FILE * const infile, Machine *const machine, uint32_t offset) {
@@ -35,49 +34,6 @@ void load_program(FILE * const infile, Machine *const machine, uint32_t offset) 
 }
 
 
-// Execute one instruction as pointed to by pc.
-// Effects: machine state is modified
-EmulatorStatus step_machine(Machine *const machine) {
-    // Follows the fetch-decode-execute loop taught in CS 241,
-    // more or less.
-
-    if (machine->pc % 4 != 0)
-        return (EmulatorStatus) {IR_UNALIGNED_INSTRUCTION_FETCH, machine->pc};
-
-    // return value false means the machine has finished
-    if (machine->pc == RETURN_ADDRESS)
-        return (EmulatorStatus) {IR_DONE, machine->pc};
-
-    // Fetch and decode
-    const Instruction ins = decode_instruction(machine->mem[machine->pc / 4]);
-    machine->pc += 4;
-
-    // Execute
-    enum instruction_retcode ret;
-    switch (ins.type) {
-        case TYPE_R:
-            ret = RTYPE_TABLE[ins.code](machine, &ins);
-            break;
-        case TYPE_I:
-            ret = ITYPE_TABLE[ins.code](machine, &ins);
-            break;
-        default:
-            give_up("Internal emulator error: Invalid instruction return code. Bye.", 1, machine);
-            assert(false); // squelch warnings
-    }
-    machine->registers[0] = 0; // the instructions don't check for zero
-
-    return (EmulatorStatus) {ret, machine->pc};
-}
-
-EmulatorStatus step_machine_loop(Machine *const machine) {
-    EmulatorStatus status;
-    do status = step_machine(machine);
-    while (status.retcode == IR_SUCCESS);
-
-    return status;
-}
-
 void dump_memory(const Machine *const machine, const char *filename) {
     FILE *dumpfile = fopen(filename, "wb");
 
@@ -100,5 +56,4 @@ void dump_memory(const Machine *const machine, const char *filename) {
 }
 
 void init_emulator(void) {
-    init_tables();
 }

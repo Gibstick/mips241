@@ -10,21 +10,11 @@
 
 struct Machine;
 
-#define RTYPE_TABLE_SIZE 64
-#define ITYPE_TABLE_SIZE 64
+// Interpet one instruction and advance the machine state
+EmulatorStatus step_machine(struct Machine *const machine);
 
+// Interpet as many instructions as we can until
+//   we are required to stop.
+EmulatorStatus step_machine_loop(struct Machine *const machine);
 
-// Must call this function on startup to initialize the dispatch table(s)!
-// Boolean indicates success.
-void init_tables(void);
-
-// Table of function pointers for r-type instructions
-// indexed by 6-bit func code
-extern enum instruction_retcode
-    (*RTYPE_TABLE[RTYPE_TABLE_SIZE]) (struct Machine * const, const Instruction * const);
-
-// Same as above, but for i-type, indexed by opcode
-extern enum instruction_retcode
-    (*ITYPE_TABLE[ITYPE_TABLE_SIZE]) (struct Machine * const, const Instruction * const);
-
-#endif 
+#endif
