@@ -44,14 +44,14 @@ EmulatorStatus step_machine(Machine *const machine) {
     if (machine->pc % 4 != 0)
         return (EmulatorStatus) {IR_UNALIGNED_INSTRUCTION_FETCH, machine->pc};
 
-    // return value false means the machine has finished 
+    // return value false means the machine has finished
     if (machine->pc == RETURN_ADDRESS)
         return (EmulatorStatus) {IR_DONE, machine->pc};
 
     // Fetch and decode
     const Instruction ins = decode_instruction(machine->mem[machine->pc / 4]);
     machine->pc += 4;
-    
+
     // Execute
     enum instruction_retcode ret;
     switch (ins.type) {
@@ -66,7 +66,7 @@ EmulatorStatus step_machine(Machine *const machine) {
             assert(false); // squelch warnings
     }
     machine->registers[0] = 0; // the instructions don't check for zero
-    
+
     return (EmulatorStatus) {ret, machine->pc};
 }
 
@@ -100,5 +100,5 @@ void dump_memory(const Machine *const machine, const char *filename) {
 }
 
 void init_emulator(void) {
-    init_tables();    
+    init_tables();
 }
