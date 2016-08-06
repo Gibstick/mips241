@@ -44,7 +44,7 @@ Stuff that is common to all frontends.
            (range i (min (+ i 4) num-registers)))
       "  ")
      (current-error-port)))
-  (displayln (format "$pc = 0x~a"
+  #;(displayln (format "$pc = 0x~a"
                       (~r #:base 16 #:min-width 8 #:pad-string "0"
                           (send m get-pc)))))
 
@@ -166,7 +166,6 @@ Stuff that is common to all frontends.
   (unless (or stdin? (file-type))
     (with-input-from-file filename
       (lambda () (file-type (guess-file-type)))))
-  (printf "file type: ~a\n" (file-type))
 
   ;; assume stdin is machine code
 

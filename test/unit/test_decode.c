@@ -1,5 +1,6 @@
 #include "minunit.h"
 #include "machine/decode.h"
+#include "common/defs.h"
 #include <stdio.h>
 
 // Helper functions for testing boilerplate

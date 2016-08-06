@@ -14,13 +14,16 @@
 Instruction decode_instruction(uint32_t);
 
 
-// Get a string representation of ins and store it in outbuf.
-// The size of the buffer is passed as size, while the number of characters
-// (strlen) is returned. A negative value indicates failure.
-// The function checks that outbuf has enough space for the null terminator as well.
-// If the return value is nonnegative, outbuf will contain a valid null-terminated string.
+// Get a string representation of ins and store it in outbuf.  The size of
+// the buffer is passed as size, while the number of characters (strlen) is
+// returned. A negative value indicates failure.  The function checks that
+// outbuf has enough space for the null terminator as well.
+// 
+// If the return value is nonnegative, outbuf will contain a valid null-terminated
+// string.  If the return value is negative, do not assume the buffer contains
+// a valid null-terminated string.
+// 
 // Requires: actual size of outbuf is at least as big as size
-int instruction_str(const Instruction *const ins, char *const outbuf, size_t size);
-
+int instruction_str(const Instruction ins, char *const outbuf, size_t size);
 
 #endif

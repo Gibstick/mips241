@@ -37,7 +37,7 @@ Instruction decode_instruction(uint32_t word) {
     // Note: invalid instructions will be caught at dispatch
 }
 
-int instruction_str(const Instruction *const ins, char *const outbuf, size_t size) {
+int instruction_str(const Instruction ins, char *const outbuf, size_t size) {
     const char * mnemonic = "";
     if (size == 0) return 0;
 
@@ -50,8 +50,8 @@ int instruction_str(const Instruction *const ins, char *const outbuf, size_t siz
     // determine mnemonic
     // two cases are needed because some opcodes
     // have the same values as funcodes
-    if (ins->type == TYPE_R) {
-        switch (ins->code) {
+    if (ins.type == TYPE_R) {
+        switch (ins.code) {
             MNEMONIC_CASE(FUNC_ADD, "add");
             MNEMONIC_CASE(FUNC_SUB, "sub");
             MNEMONIC_CASE(FUNC_MULT, "mult");
@@ -68,8 +68,8 @@ int instruction_str(const Instruction *const ins, char *const outbuf, size_t siz
             default:
                mnemonic = UNKNOWN_INSTRUCTION;
         }
-    } else if (ins->type == TYPE_I) {
-        switch (ins->code) {
+    } else if (ins.type == TYPE_I) {
+        switch (ins.code) {
             MNEMONIC_CASE(OP_LW, "lw");
             MNEMONIC_CASE(OP_SW, "sw");
             MNEMONIC_CASE(OP_BEQ, "beq");
@@ -84,43 +84,60 @@ int instruction_str(const Instruction *const ins, char *const outbuf, size_t siz
     }
 
     // determine registers/data
-    if (ins->type == TYPE_R) {
-        switch (ins->code) {
+    if (ins.type == TYPE_R) {
+        switch (ins.code) {
             case FUNC_ADD:
             case FUNC_SUB:
             case FUNC_SLT:
             case FUNC_SLTU:
-              retval = snprintf(outbuf, size, "%s $%d $%d $%d", mnemonic,
-                                ins->decoded.r.d,
-                                ins->decoded.r.s,
-                                ins->decoded.r.t);
+              retval = snprintf(outbuf, size, "%s $%d, $%d, $%d", mnemonic,
+                                ins.decoded.r.d,
+                                ins.decoded.r.s,
+                                ins.decoded.r.t);
               break;
             case FUNC_MULT:
             case FUNC_MULTU:
             case FUNC_DIV:
             case FUNC_DIVU:
-              retval = snprintf(outbuf, size, "%s $%d $%d", mnemonic,
-                                ins->decoded.r.s,
-                                ins->decoded.r.t);
+              retval = snprintf(outbuf, size, "%s $%d, $%d", mnemonic,
+                                ins.decoded.r.s,
+                                ins.decoded.r.t);
               break;
             case FUNC_MFHI:
             case FUNC_MFLO:
             case FUNC_LIS:
               retval = snprintf(outbuf, size, "%s $%d", mnemonic,
-                                ins->decoded.r.d);
+                                ins.decoded.r.d);
               break;
             case FUNC_JR:
             case FUNC_JALR:
               retval = snprintf(outbuf, size, "%s $%d", mnemonic,
-                                ins->decoded.r.s);
+                                ins.decoded.r.s);
               break;
             default:
               retval = -1;
         } // invalid instruction already caught above
     } else {
-        switch (ins->code) {
-
+        switch (ins.code) {
+            case OP_LW:
+            case OP_SW:
+                retval = snprintf(outbuf, size, "%s $%d, %d($%d)", mnemonic,
+                                  ins.decoded.i.t,
+                                  ins.decoded.i.imm,
+                                  ins.decoded.i.s);
+                break;
+            case OP_BEQ:
+            case OP_BNE:
+                // 0x%08x
+                retval = snprintf(outbuf, size, "%s $%d, $%d, %d", mnemonic,
+                                  ins.decoded.i.s,
+                                  ins.decoded.i.t,
+                                  ins.decoded.i.imm);
+                break;
         }
-
     }
+    if (retval >= size)
+        return -1;
+    else
+        return retval;
 }
