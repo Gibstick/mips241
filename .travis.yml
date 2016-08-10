@@ -5,7 +5,9 @@ sudo: required
 dist: trusty
 
 env:
-    - RACKET_VERSION=6.3
+    - RACKET_VERSION=6.3 RACKET_FAST_BUILD=1
+    - RACKET_VERSION=6.3 RACKET_FAST_BUILD=0
+    - RACKET_VERSION=RELEASE RACKET_FAST_BUILD=1
 
 before_install:
     - sudo apt-get -qq update
