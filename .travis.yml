@@ -21,3 +21,11 @@ compiler:
     - gcc
     - clang
 
+matrix:
+    exclude:
+        - env : RACKET_VERSION=6.3 RACKET_FAST_BUILD=0
+          compiler: clang
+        - env : RACKET_VERSION=RELEASE RACKET_FAST_BUILD=0
+          compiler: clang
+        - env : RACKET_VERSION=6.3 RACKET_FAST_BUILD=1
+          compiler: clang
