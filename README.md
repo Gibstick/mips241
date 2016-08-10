@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/Gibstick/mips241.svg?branch=master)](https://travis-ci.org/Gibstick/mips241)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A MIPS ~~emulator~~ intepreter for a small subset of MIPS used for CS 241
 at the University of Waterloo.
