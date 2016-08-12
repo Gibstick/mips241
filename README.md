@@ -18,6 +18,7 @@ the groundwork has been laid out.
 
 - CMake: a recent version (check the top-level CMakeLists.txt)
 - Racket: Probably any recent version (2015+) will work. Tested on 6.3+.
+- realpath: from coreutils
 
 # Building
 
@@ -34,7 +35,7 @@ AddressSanitizer, and debugging enabled:
 ````sh
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DSANITIZE_ADDRESS=on
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DSANITIZE_ADDRESS=on ..
 make
 ````
 
