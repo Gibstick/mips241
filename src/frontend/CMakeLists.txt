@@ -24,7 +24,9 @@ add_custom_target(racket_frontends ALL
     COMMAND ${RACKET} -l raco/main exe ${RACO_EXE_FLAGS} -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.basic" frontend.rkt
     COMMAND ${RACKET} -l raco/main exe ${RACO_EXE_FLAGS} -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.custom" custom.rkt
     COMMAND ${RACKET} -l raco/main exe ${RACO_EXE_FLAGS} -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.legacy" legacy.rkt
+    COMMAND ${RACKET} -l raco/main exe ${RACO_EXE_FLAGS} -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.oneint" --exf -U -- oneint.rkt 
     COMMENT "Compiling Racket frontends"
+    COMMAND ${RACKET} -l raco/main pkg install --batch --skip-installed threading
 )
 
 add_test(
