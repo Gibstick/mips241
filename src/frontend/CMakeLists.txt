@@ -17,8 +17,15 @@ add_custom_target(copy_racket_frontends ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/racket"
 )
 
+SET(RACKET_PKGS
+    threading
+)
+
+add_custom_target(racket_dependencies ALL
+    COMMAND ${RACKET} -l raco/main pkg install --skip-installed --batch ${RACKET_PKGS}) 
+
 add_custom_target(racket_frontends ALL
-    DEPENDS copy_racket_frontends
+    DEPENDS copy_racket_frontends racket_dependencies
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/racket"
     COMMAND ${RACKET} -l raco/main make bindings.rkt frontend.rkt custom.rkt
     COMMAND ${RACKET} -l raco/main exe ${RACO_EXE_FLAGS} -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.basic" frontend.rkt
@@ -26,7 +33,6 @@ add_custom_target(racket_frontends ALL
     COMMAND ${RACKET} -l raco/main exe ${RACO_EXE_FLAGS} -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.legacy" legacy.rkt
     COMMAND ${RACKET} -l raco/main exe ${RACO_EXE_FLAGS} -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mips241.oneint" --exf -U -- oneint.rkt 
     COMMENT "Compiling Racket frontends"
-    COMMAND ${RACKET} -l raco/main pkg install --batch --skip-installed threading
 )
 
 add_test(
