@@ -5,7 +5,7 @@
 failed=0
 
 # absolute path to directory containing the config file
-path_prefix=$(realpath $(dirname "${2}"))
+path_prefix=$(readlink -f $(dirname "${2}"))
 # other test files are relative to $path_prefix
 
 while read filename; do

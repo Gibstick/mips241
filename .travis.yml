@@ -1,21 +1,27 @@
+# thanks https://github.com/greghendershott/travis-racket/
+
 language: c
 
-# This gets us CMake 2.8.12 (>= 2.8.8)
-sudo: required
-dist: trusty
+sudo: false
 
 env:
-    - RACKET_VERSION=6.3 RACKET_FAST_BUILD=1
-    - RACKET_VERSION=6.3 RACKET_FAST_BUILD=0
-    - RACKET_VERSION=RELEASE RACKET_FAST_BUILD=1
+    global:
+        - RACKET_DIR=$HOME/racket
+        - CMAKE_PROGRAM_PATH=$HOME/racket/bin
+    matrix:
+        - RACKET_VERSION=6.3 RACKET_FAST_BUILD=1
+        - RACKET_VERSION=6.3 RACKET_FAST_BUILD=0
+        - RACKET_VERSION=RELEASE RACKET_FAST_BUILD=1
 
 before_install:
-    - sudo apt-get -qq update
-    - sudo apt-get install -y --no-install-recommends realpath
     - git clone --depth 1 https://github.com/greghendershott/travis-racket.git >/dev/null
     - bash travis-racket/install-racket.sh
+    - curl -O https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz
+    - tar xf cmake-3.5.2-Linux-x86_64.tar.gz
+    - export PATH=$PWD/cmake-3.5.2-Linux-x86_64/bin/:$PATH
+    - cmake --version
 
-script: mkdir build && cd build && cmake -DSANITIZE_ADDRESS=on .. && make && ctest -V
+script: mkdir build && cd build && cmake -DSANITIZE_ADDRESS=on .. && make -j && ctest -V
 
 compiler:
     - gcc
@@ -29,3 +35,7 @@ matrix:
           compiler: clang
         - env : RACKET_VERSION=6.3 RACKET_FAST_BUILD=1
           compiler: clang
+
+cache:
+    directories:
+        - $HOME/.racket/download-cache
