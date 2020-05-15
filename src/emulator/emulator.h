@@ -11,14 +11,15 @@
 
 
 // Load a program from a FILE into the machine at the offset.
-void load_program(FILE *const file,
+mips241_EXPORT void load_program(FILE *const file,
                   Machine *const machine,
                   uint32_t offset);
 
 // Must call this function on startup to initialize things.
-void init_emulator(void);
+mips241_EXPORT void init_emulator(void);
 
 // Dump memory to the file
-void dump_memory(const Machine *const machine, const char *filename);
+mips241_EXPORT void dump_memory(const Machine *const machine,
+                  const char *filename);
 
 #endif
