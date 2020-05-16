@@ -3,3 +3,17 @@ build/
 *.swp
 *.rkt~
 compiled/
+src/common/mips241_export.h
+
+# visual studio
+CMakeSettings.json
+.vs/
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb

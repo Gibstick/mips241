@@ -7,6 +7,7 @@
 #define MACHINE_H__
 
 #include <stdint.h>
+#include "common/defs.h"
 
 #define NUM_WORDS_MEMORY 4194304 // 16 MB of RAM by default
 #define NUM_REGISTERS 32         // does not include pc, ir, lo, hi
@@ -26,17 +27,17 @@ typedef struct Machine {
 //   is given to the machine in bytes. Otherwise,
 //   the default amount of memory is used.
 // Requires: max_memory_bytes is divisible by 4
-Machine *init_machine(uint32_t max_memory_bytes);
+mips241_EXPORT Machine *init_machine(uint32_t max_memory_bytes);
 
 
 // Frees all memory associated with a Machine.
 // Requires: machine allocated with init_machine
 // Effects: memory freed
-void destroy_machine(Machine *machine);
+mips241_EXPORT void destroy_machine(Machine *machine);
 
 
 // Prints all registers to stderr.
 // Effects: output
-void m_print_registers(const Machine *const machine);
+mips241_EXPORT void m_print_registers(const Machine *const machine);
 
 #endif

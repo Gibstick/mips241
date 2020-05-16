@@ -21,6 +21,8 @@ the groundwork has been laid out.
 
 # Building
 
+## *NIX environments
+
 The project has external dependencies as git submodules. Use `--recursive`
 as a flag to `git clone`. If you have already cloned,
 ```sh
@@ -37,6 +39,13 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DSANITIZE_ADDRESS=on ..
 make
 ````
+
+## Windows with MSVC
+
+If you are using Visual Studio, open the project folder inside Visual Studio (make
+sure C++ build tools are installed), the software should automatically recognize
+it as a CMake project. Go to manage configurations, and check the "SANITIZE_ADDRESS"
+checkbox, then right click CMakeLists.txt -> build.
 
 # Install
 

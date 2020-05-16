@@ -10,6 +10,10 @@ Basically, the following files need to be "ported":
   - common/defs.h
 |#
 
+;; for windows, lib name does not have the lib-prefix
+(define mips241-libname
+    (if (eq? (system-type 'os) 'windows) "mips241" "libmips241"))
+
 (require ffi/unsafe
          ffi/unsafe/define
          ffi/unsafe/alloc
@@ -30,7 +34,7 @@ Basically, the following files need to be "ported":
 
 (define num-registers 32)
 (define-ffi-definer define-mips241
-  (ffi-lib "libmips241"
+  (ffi-lib mips241-libname
            #:get-lib-dirs get-paths-for-lib))
 
 ;; Types from C. These must match!

@@ -11,10 +11,10 @@
 struct Machine;
 
 // Interpet one instruction and advance the machine state
-EmulatorStatus step_machine(struct Machine *const machine);
+mips241_EXPORT EmulatorStatus step_machine(struct Machine *const machine);
 
 // Interpet as many instructions as we can until
 //   we are required to stop.
-EmulatorStatus step_machine_loop(struct Machine *const machine);
+mips241_EXPORT EmulatorStatus step_machine_loop(struct Machine *const machine);
 
 #endif

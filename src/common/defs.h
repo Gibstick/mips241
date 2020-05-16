@@ -6,6 +6,13 @@
 
 #include <stdint.h>
 
+/* Windows dll needs this declaration for library export */
+#if (defined(_MSC_VER) || defined(__MINGW32__))
+    #define mips241_EXPORT __declspec(dllexport)
+#else
+    #define mips241_EXPORT
+#endif
+
 #define FUNC_ADD    0x20
 #define FUNC_SUB    0x22
 #define FUNC_MULTU  0x19
